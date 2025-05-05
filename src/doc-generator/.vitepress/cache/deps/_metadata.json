@@ -1,0 +1,64 @@
+{
+  "hash": "37bec91e",
+  "configHash": "b44634f5",
+  "lockfileHash": "29d2e168",
+  "browserHash": "d8f93070",
+  "optimized": {
+    "vue": {
+      "src": "../../../node_modules/vue/dist/vue.runtime.esm-bundler.js",
+      "file": "vue.js",
+      "fileHash": "9ab3d425",
+      "needsInterop": false
+    },
+    "vitepress > @vue/devtools-api": {
+      "src": "../../../node_modules/@vue/devtools-api/dist/index.js",
+      "file": "vitepress___@vue_devtools-api.js",
+      "fileHash": "8ace6570",
+      "needsInterop": false
+    },
+    "vitepress > @vueuse/core": {
+      "src": "../../../node_modules/@vueuse/core/index.mjs",
+      "file": "vitepress___@vueuse_core.js",
+      "fileHash": "8232921a",
+      "needsInterop": false
+    },
+    "vitepress > @vueuse/integrations/useFocusTrap": {
+      "src": "../../../node_modules/@vueuse/integrations/useFocusTrap.mjs",
+      "file": "vitepress___@vueuse_integrations_useFocusTrap.js",
+      "fileHash": "19b105e2",
+      "needsInterop": false
+    },
+    "vitepress > mark.js/src/vanilla.js": {
+      "src": "../../../node_modules/mark.js/src/vanilla.js",
+      "file": "vitepress___mark__js_src_vanilla__js.js",
+      "fileHash": "c14a7fe9",
+      "needsInterop": false
+    },
+    "vitepress > minisearch": {
+      "src": "../../../node_modules/minisearch/dist/es/index.js",
+      "file": "vitepress___minisearch.js",
+      "fileHash": "cca0d968",
+      "needsInterop": false
+    },
+    "vue3-tabs-component": {
+      "src": "../../../node_modules/vue3-tabs-component/dist/vue3-tabs-component.mjs",
+      "file": "vue3-tabs-component.js",
+      "fileHash": "6f2f384e",
+      "needsInterop": false
+    },
+    "@pointw/vitepress-component-bundle": {
+      "src": "../../../node_modules/@pointw/vitepress-component-bundle/dist/vitepress-component-bundle.es.js",
+      "file": "@pointw_vitepress-component-bundle.js",
+      "fileHash": "f4fe6914",
+      "needsInterop": false
+    }
+  },
+  "chunks": {
+    "chunk-6F5JWMBQ": {
+      "file": "chunk-6F5JWMBQ.js"
+    },
+    "chunk-VJWGEPT5": {
+      "file": "chunk-VJWGEPT5.js"
+    }
+  }
+}

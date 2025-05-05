@@ -1,0 +1,33 @@
+{
+  "name": "envarna",
+  "version": "0.3.6",
+  "type": "module",
+  "description": "Settings managed. A flexible library for configuration details.",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "bin": {
+    "envarna": "./dist/bin/envarna.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "prepare": "npm run build"
+  },
+  "dependencies": {
+    "change-case": "^4.0.0",
+    "dotenv": "^10.0.0",
+    "reflect-metadata": "^0.2.2",
+    "ts-morph": "^25.0.1",
+    "yargs": "^17.7.2",
+    "zod": "^3.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.2",
+    "@types/yargs": "^17.0.33",
+    "typescript": "^5.0.0"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ]
+}
