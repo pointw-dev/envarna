@@ -1,6 +1,6 @@
 import { z, ZodTypeAny, ZodStringCheck, ZodNumberCheck } from "zod";
 import 'reflect-metadata';
-import { toEnvVar } from "./utils";
+import { toEnvVar } from "./utils.js";
 
 const fieldMetadata = new WeakMap<Function, Record<string, z.ZodTypeAny>>();
 
