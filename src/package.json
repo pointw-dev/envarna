@@ -1,7 +1,6 @@
 {
   "name": "envarna",
   "version": "0.3.6",
-  "type": "module",
   "description": "Settings managed. A flexible library for configuration details.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -9,6 +8,7 @@
     "envarna": "./dist/bin/envarna.js"
   },
   "scripts": {
+    "test": "cucumber-js",
     "build": "tsc",
     "prepare": "npm run build"
   },
@@ -21,8 +21,15 @@
     "zod": "^3.0.0"
   },
   "devDependencies": {
+    "@types/chai": "^5.2.2",
+    "@types/cucumber": "^6.0.1",
+    "@types/dotenv": "^6.1.1",
     "@types/node": "^22.15.2",
     "@types/yargs": "^17.0.33",
+    "chai": "^5.2.0",
+    "cucumber": "^6.0.7",
+    "cucumber-tsflow": "^4.4.4",
+    "ts-node": "^10.9.2",
     "typescript": "^5.0.0"
   },
   "files": [
