@@ -1,55 +1,55 @@
 {
-  "hash": "37bec91e",
+  "hash": "4c4c5c23",
   "configHash": "b44634f5",
-  "lockfileHash": "29d2e168",
-  "browserHash": "d8f93070",
+  "lockfileHash": "8ad7677b",
+  "browserHash": "7c78f8d1",
   "optimized": {
     "vue": {
       "src": "../../../node_modules/vue/dist/vue.runtime.esm-bundler.js",
       "file": "vue.js",
-      "fileHash": "9ab3d425",
+      "fileHash": "03db6506",
       "needsInterop": false
     },
     "vitepress > @vue/devtools-api": {
       "src": "../../../node_modules/@vue/devtools-api/dist/index.js",
       "file": "vitepress___@vue_devtools-api.js",
-      "fileHash": "8ace6570",
+      "fileHash": "670adb25",
       "needsInterop": false
     },
     "vitepress > @vueuse/core": {
       "src": "../../../node_modules/@vueuse/core/index.mjs",
       "file": "vitepress___@vueuse_core.js",
-      "fileHash": "8232921a",
+      "fileHash": "dbb6c4f8",
       "needsInterop": false
     },
     "vitepress > @vueuse/integrations/useFocusTrap": {
       "src": "../../../node_modules/@vueuse/integrations/useFocusTrap.mjs",
       "file": "vitepress___@vueuse_integrations_useFocusTrap.js",
-      "fileHash": "19b105e2",
+      "fileHash": "b9e573a0",
       "needsInterop": false
     },
     "vitepress > mark.js/src/vanilla.js": {
       "src": "../../../node_modules/mark.js/src/vanilla.js",
       "file": "vitepress___mark__js_src_vanilla__js.js",
-      "fileHash": "c14a7fe9",
+      "fileHash": "cde45cf6",
       "needsInterop": false
     },
     "vitepress > minisearch": {
       "src": "../../../node_modules/minisearch/dist/es/index.js",
       "file": "vitepress___minisearch.js",
-      "fileHash": "cca0d968",
+      "fileHash": "d574fa50",
       "needsInterop": false
     },
     "vue3-tabs-component": {
       "src": "../../../node_modules/vue3-tabs-component/dist/vue3-tabs-component.mjs",
       "file": "vue3-tabs-component.js",
-      "fileHash": "6f2f384e",
+      "fileHash": "f0999516",
       "needsInterop": false
     },
     "@pointw/vitepress-component-bundle": {
       "src": "../../../node_modules/@pointw/vitepress-component-bundle/dist/vitepress-component-bundle.es.js",
       "file": "@pointw_vitepress-component-bundle.js",
-      "fileHash": "f4fe6914",
+      "fileHash": "9c07e6de",
       "needsInterop": false
     }
   },
