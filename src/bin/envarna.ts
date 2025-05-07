@@ -21,21 +21,21 @@ const pkg = JSON.parse(readFileSync(pkgPath, 'utf-8'))
 yargs(hideBin(process.argv))
   .version(pkg.version)
   .scriptName('envarna')
-  .command('list', 'Displays settings details', () => {}, () => {
-    printSettings()
+  .command('list', 'Displays settings details', () => {}, async () => {
+    await printSettings()
   })
-  .command('md', 'Generate "SETTINGS.md" file', () => {}, () => {
-    writeSettingsMarkdown()
+  .command('md', 'Generate "SETTINGS.md" file', () => {}, async () => {
+    await writeSettingsMarkdown()
   })
-  .command('env', 'Generate ".env.sample" file', () => {}, () => {
-    writeEnvFile()
+  .command('env', 'Generate ".env.sample" file', () => {}, async () => {
+    await writeEnvFile()
   })
-  .command('values', 'Generate "values.yaml" file', () => {}, () => {
-    writeValuesYaml()
+  .command('values', 'Generate "values.yaml" file', () => {}, async () => {
+    await writeValuesYaml()
   })
-    .command('compose', 'Generate "environment.yml" file (for use in docker-compose.yml)', () => {}, () => {
-      writeComposeEnvFile()
-    })
+  .command('compose', 'Generate "environment.yml" file (for use in docker-compose.yml)', () => {}, async () => {
+    await writeComposeEnvFile()
+  })
   .demandCommand()
   .strict()
   .help()

@@ -1,12 +1,13 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import { extractEnvSpec, PROJECT_ROOT } from './extractEnvSpec.js';
 import { camelCase } from 'change-case';
+import { extractEnvSpec } from './extractEnvSpec.js';
+import { PROJECT_ROOT } from '../lib/paths.js';
 
 const OUTPUT_FILE = path.join(PROJECT_ROOT, 'values.yaml');
 
-export function writeValuesYaml(): void {
-  const spec = extractEnvSpec();
+export async function writeValuesYaml(): Promise<void> {
+  const spec = await extractEnvSpec();
   const lines: string[] = [];
 
   for (const [section, group] of Object.entries(spec)) {

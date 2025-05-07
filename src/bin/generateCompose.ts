@@ -1,11 +1,12 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import { extractEnvSpec, PROJECT_ROOT } from './extractEnvSpec.js';
+import { extractEnvSpec } from './extractEnvSpec.js';
+import { PROJECT_ROOT } from '../lib/paths.js';
 
 const OUTPUT_FILE = path.join(PROJECT_ROOT, 'environment.yml');
 
-export function writeComposeEnvFile(): void {
-    const spec = extractEnvSpec();
+export async function writeComposeEnvFile(): Promise<void> {
+    const spec = await extractEnvSpec();
 
     const lines: string[] = ['environment:'];
     for (const [, group] of Object.entries(spec)) {

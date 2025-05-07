@@ -1,6 +1,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import { extractEnvSpec, PROJECT_ROOT } from './extractEnvSpec.js';
+import { extractEnvSpec } from './extractEnvSpec.js';
+import { PROJECT_ROOT } from '../lib/paths.js';
 
 const OUTPUT_FILE = path.join(PROJECT_ROOT, 'SETTINGS.md');
 
@@ -52,8 +53,8 @@ function toMarkdownTable(
     return `${sectionHeader}${secretsLine}${descriptionLine}\n${header}\n${rows.join('\n')}${extras}`;
 }
 
-export function writeSettingsMarkdown(): void {
-    const spec = extractEnvSpec();
+export async function writeSettingsMarkdown(): Promise<void> {
+    const spec = await extractEnvSpec();
     const sections = Object.entries(spec)
         .map(([section, group]) => toMarkdownTable(section, group))
         .join('\n\n');

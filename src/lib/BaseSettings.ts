@@ -1,18 +1,24 @@
 import { z, ZodObject, ZodRawShape, ZodTypeAny } from "zod";
 import 'reflect-metadata';
+import dotenv from "dotenv";
 import { extractPrefixedEnv } from "./utils.js";
 import { getFieldSchemas, isSecret } from "./decorators.js";
-import dotenv from "dotenv";
+import { DOTENV_PATH } from "./paths.js";
 
 export class BaseSettings {
-  // Subclasses can override this to hook into Zod schema building
+  /**
+   * Subclasses can override this to hook into the Zod schema before validation.
+   * Used for `.superRefine()` or other advanced schema manipulations.
+   */
   protected static refineSchema(
       schema: ZodObject<ZodRawShape, "strip", ZodTypeAny>
   ): ZodObject<ZodRawShape, "strip", ZodTypeAny> {
     return schema;
   }
 
-  // Subclasses can override this to validate an instantiated object
+  /**
+   * Subclasses can override this to add custom validation logic after instantiation.
+   */
   protected validate(): void {
     // Default no-op
   }
@@ -20,20 +26,22 @@ export class BaseSettings {
   /**
    * Loads a settings instance by validating and merging values from one of two sources:
    *
-   * - If `values` is provided, those values are used directly with no fallback to `.env` or `process.env`.
-   * - If `values` is omitted, settings are loaded from environment variables (after `dotenv.config()`),
-   *   filtered by the class prefix (e.g., `SMTP_` for `SmtpSettings`).
+   * - If `values` is provided, those values are used directly (bypassing `.env` and `process.env`).
+   * - If `values` is omitted, values are loaded from environment variables (after `dotenv.config()`),
+   *   filtered by a prefix derived from the class name (e.g., `SMTP_` for `SmtpSettings`).
    *
-   * In both cases, defaults defined on the class instance are applied first and overridden by the source values.
-   *
-   * @param values - Optional direct settings object. If provided, skips env file and env var loading entirely.
-   * @returns An instance of the settings class with all fields validated and assigned.
+   * Field schemas must be registered using the `@setting(...)` decorator.
+   * You may use either `@setting.string()` style or full zod schemas: `@setting(z.string().min(3))`
    */
   static load<T extends typeof BaseSettings>(
       this: T,
       values?: Record<string, unknown>
   ): InstanceType<T> {
     const schemaShape = getFieldSchemas(this);
+    if (Object.keys(schemaShape).length === 0) {
+      throw new Error(`No fields declared for ${this.name}. Did you forget to decorate fields with @setting()?`);
+    }
+
     let schema = z.object(schemaShape).strip();
     schema = this.refineSchema(schema);
 
@@ -43,19 +51,10 @@ export class BaseSettings {
     let merged: Record<string, unknown> = {};
 
     if (values) {
-      // Use direct values only; skip env file and process.env entirely
       merged = { ...defaults, ...values };
     } else {
-      // Load from .env and process.env using prefixed keys
-      //
-      // Precedence hierarchy:
-      //   1. Injected values passed to `load()` (if provided)
-      //   2. Environment variables in `process.env`
-      //   3. Variables loaded from `.env` by `dotenv` (only if not already in `process.env`)
-      //   4. Defaults declared in the class
-      //
-      // Note: `dotenv.config()` will not override existing `process.env` values.
-      dotenv.config();
+      dotenv.config({ path: DOTENV_PATH });
+      // Does not override existing process.env values
       const prefix = this.name.replace(/Settings$/, '').toUpperCase() + '_';
       const rawEnv = extractPrefixedEnv(prefix, process.env);
       merged = { ...defaults, ...rawEnv };
@@ -79,7 +78,11 @@ export class BaseSettings {
     return instance;
   }
 
-  toJSON() {
+  /**
+   * Returns a JSON representation of the settings instance.
+   * Secret values (marked with `@secret`) will appear as `'****'`.
+   */
+  toJSON(): Record<string, unknown> {
     const result: Record<string, unknown> = {};
     for (const key of Object.keys(this)) {
       result[key] = isSecret(this, key) ? '****' : (this as any)[key];
