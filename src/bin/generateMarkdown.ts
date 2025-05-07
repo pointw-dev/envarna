@@ -12,37 +12,46 @@ function toMarkdownTable(
         string,
         {
             default: string | null;
-            required: boolean;
             originalName: string;
             secret: boolean;
             type: string;
+            description?: string | null;
+            pattern?: string | null;
         }
     >
 ): string {
-    const header = `| Code | Envar | Type | Default | Required |
-| ----------------------- | -------------- | --------- | --------- | -------- |`;
+    const description = group._description ?? null;
+    const entries = Object.entries(group).filter(([k]) => k !== '_description');
 
-    const rows = Object.entries(group).map(([envVar, entry]) => {
-        const {
-            default: def,
-            required,
-            originalName,
-            secret,
-            type
-        } = entry;
+    const header = `| Code | Envar | Type | Default |
+| ----------------------- | -------------- | ------------------ | --------- |`;
 
-        const code = `settings.${section.toLowerCase()}.${originalName}` + (secret ? ' (secret)' : '');
-        const value = def ?? '';
-        const req = required ? 'Yes' : 'No';
-
-        return `| ${code} | ${envVar} | ${type} | ${value} | ${req} |`;
+    const rows = entries.map(([envVar, entry]) => {
+        const code = `settings.${section.toLowerCase()}.${entry.originalName}` + (entry.secret ? ' (secret)' : '');
+        return `| ${code} | ${envVar} | ${entry.type} | ${entry.default ?? ''} |`;
     });
 
-    const hasSecrets = Object.values(group).some(entry => entry.secret);
-    const headerLine = `## ${section.toLowerCase()}`;
+    const hasSecrets = entries.some(([, entry]) => entry.secret);
+    const sectionHeader = `## ${section.toLowerCase()}`;
     const secretsLine = hasSecrets ? `\n> contains secrets\n` : '';
+    const descriptionLine = description ? `\n${description}\n` : '';
 
-    return `${headerLine}${secretsLine}\n\n${header}\n${rows.join('\n')}\n`;
+    // Add field-level detail blocks
+    const details = entries
+        .filter(([, entry]) => entry.description || entry.pattern)
+        .map(([envVar, entry]) => {
+            const code = `settings.${section.toLowerCase()}.${entry.originalName}`;
+            const lines = [];
+
+            if (entry.description) lines.push(entry.description);
+            if (entry.pattern) lines.push(`**Pattern:** \`${entry.pattern}\``);
+
+            return `### ${code}\n\n${lines.join('\n\n')}`;
+        });
+
+    const extras = details.length > 0 ? `\n\n${details.join('\n\n')}` : '';
+
+    return `${sectionHeader}${secretsLine}${descriptionLine}\n${header}\n${rows.join('\n')}${extras}`;
 }
 
 export function writeSettingsMarkdown(): void {

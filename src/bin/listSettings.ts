@@ -11,35 +11,32 @@ export function printSettings(): void {
     for (const [section, group] of Object.entries(spec)) {
         const rows: string[][] = [];
 
-        const hasSecrets = Object.values(group).some(entry => entry.secret);
+        // Header and rule
+        rows.push(['Code', 'Envar', 'Type', 'Default']);
+        rows.push(['-----------------------', '--------------', '------------------', '---------']);
 
-        rows.push(['Code', 'Envar', 'Type', 'Default', 'Required']);
-        rows.push([
-            '-----------------------',
-            '--------------',
-            '---------',
-            '---------',
-            '--------',
-        ]);
-
-        for (const [envVar, { default: def, required, originalName, secret, type }] of Object.entries(group)) {
-            const code = `settings.${section.toLowerCase()}.${originalName}` + (secret ? ' (secret)' : '');
+        for (const [envVar, { default: def, originalName, secret, type }] of Object.entries(group)) {
             rows.push([
-                code,
+                `settings.${section.toLowerCase()}.${originalName}${secret ? ' (secret)' : ''}`,
                 envVar,
                 type,
                 def ?? '',
-                required ? 'Yes' : 'No',
             ]);
         }
 
+        // Determine column widths
         const colWidths = rows[0].map((_, colIndex) =>
             Math.max(...rows.map(row => row[colIndex].length))
         );
 
-        const sectionHeader = section.toLowerCase() + (hasSecrets ? ' (contains secrets)' : '');
-        console.log(sectionHeader);
-        console.log('='.repeat(sectionHeader.length));
+        // Print section
+        console.log(section.toLowerCase());
+        console.log('='.repeat(section.length));
+
+        const hasSecrets = Object.values(group).some(entry => entry.secret);
+        if (hasSecrets) {
+            console.log('(contains secrets)');
+        }
 
         for (const row of rows) {
             const line = row
@@ -48,7 +45,7 @@ export function printSettings(): void {
             console.log(line);
         }
 
-        console.log();
+        console.log(); // Blank line between sections
     }
 }
 

@@ -1,3 +1,4 @@
+// @ts-ignore  // not sure why this is necessary ?!?
 import dotenv from 'dotenv';
 import { tmpdir } from 'os';
 import { writeFileSync, mkdtempSync, rmSync } from 'fs';
