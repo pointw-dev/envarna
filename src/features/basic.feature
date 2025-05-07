@@ -4,7 +4,7 @@ Feature: Members of BaseSettings objects are populated in various ways
     Given the environment variable "API_HOST" is set to "from-process"
     And a class named ApiSettings includes a setting named host
     When I load settings
-    Then the setting value is "from-process"
+    Then the setting "host" value is "from-process"
 
   Scenario: settings value loaded from .env file
     Given an .env file that contains:
@@ -13,7 +13,7 @@ Feature: Members of BaseSettings objects are populated in various ways
     """
     And a class named ApiSettings includes a setting named host
     When I load settings
-    Then the setting value is "from-dotenv"
+    Then the setting "host" value is "from-dotenv"
 
   Scenario: envars take precedence over .env file
     Given the environment variable "API_HOST" is set to "from-process"
@@ -23,7 +23,7 @@ Feature: Members of BaseSettings objects are populated in various ways
     """
     And a class named ApiSettings includes a setting named host
     When I load settings
-    Then the setting value is "from-process"
+    Then the setting "host" value is "from-process"
 
   Scenario: injection takes precedence over envars and .env file
     Given the environment variable "API_HOST" is set to "from-process"
@@ -33,4 +33,10 @@ Feature: Members of BaseSettings objects are populated in various ways
     """
     And a class named ApiSettings includes a setting named host
     When I load settings with a value "from-injection"
-    Then the setting value is "from-injection"
+    Then the setting "host" value is "from-injection"
+
+  Scenario: repeating prefixes
+    Given the environment variable "API_API_KEY" is set to "from-process"
+    And a class named ApiSettings includes a setting named apiKey
+    When I load settings
+    Then the setting "apiKey" value is "from-process"

@@ -34,6 +34,16 @@ export const setting = Object.assign(
   }
 );
 
+export function secret() {
+  return function (target: any, propertyKey: string) {
+    Reflect.defineMetadata('envarna:secret', true, target, propertyKey);
+  };
+}
+
+export function isSecret(target: any, propertyKey: string): boolean {
+  return Reflect.getMetadata('envarna:secret', target, propertyKey) === true;
+}
+
 type ZodDecoratorBuilder = ZodTypeAny & PropertyDecorator;
 
 function wrap(baseSchema: ZodTypeAny): ZodDecoratorBuilder {

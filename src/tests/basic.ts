@@ -32,8 +32,19 @@ Given('an .env file that contains:', function (docString: string) {
 
 Given('a class named ApiSettings includes a setting named host', function(this: TestWorld) {
     class ApiSettings extends BaseSettings {
+        // @ts-ignore
         @setting.string()
         host: string = 'nope'
+    }
+
+    this.settingsClass = ApiSettings
+})
+
+Given('a class named ApiSettings includes a setting named apiKey', function(this: TestWorld) {
+    class ApiSettings extends BaseSettings {
+        // @ts-ignore
+        @setting.string()
+        apiKey: string = 'nope'
     }
 
     this.settingsClass = ApiSettings
@@ -49,7 +60,8 @@ When('I load settings with a value {string}', function (injection: string) {
 });
 
 
-Then('the setting value is {string}', function (expected: string) {
-    const actual = this.settings.host;
+Then('the setting {string} value is {string}', function (settingKey: string, expected: string) {
+    const actual = this.settings[settingKey];
     expect(actual).to.equal(expected);
 });
+

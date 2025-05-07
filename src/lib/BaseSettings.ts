@@ -1,7 +1,7 @@
 import { z, ZodObject, ZodRawShape, ZodTypeAny } from "zod";
 import 'reflect-metadata';
 import { extractPrefixedEnv } from "./utils.js";
-import { getFieldSchemas } from "./decorators.js";
+import { getFieldSchemas, isSecret } from "./decorators.js";
 import dotenv from "dotenv";
 
 export class BaseSettings {
@@ -77,5 +77,13 @@ export class BaseSettings {
 
     instance.validate();
     return instance;
+  }
+
+  toJSON() {
+    const result: Record<string, unknown> = {};
+    for (const key of Object.keys(this)) {
+      result[key] = isSecret(this, key) ? '****' : (this as any)[key];
+    }
+    return result;
   }
 }

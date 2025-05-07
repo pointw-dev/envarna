@@ -8,6 +8,7 @@ import { writeSettingsMarkdown } from "./generateMarkdown.js";
 import { writeEnvFile } from './generateDotEnv.js'
 import { writeValuesYaml } from './generateValues.js'
 import { printSettings } from './listSettings.js';
+import { writeComposeEnvFile } from './generateCompose.js'
 import path from 'path'
 
 // Locate package.json relative to *compiled* file (e.g., dist/bin/envarna.js)
@@ -32,6 +33,9 @@ yargs(hideBin(process.argv))
   .command('values', 'Generate "values.yaml" file', () => {}, () => {
     writeValuesYaml()
   })
+    .command('compose', 'Generate "environment.yml" file (for use in docker-compose.yml)', () => {}, () => {
+      writeComposeEnvFile()
+    })
   .demandCommand()
   .strict()
   .help()

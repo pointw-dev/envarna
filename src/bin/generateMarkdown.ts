@@ -10,20 +10,39 @@ function toMarkdownTable(
     section: string,
     group: Record<
         string,
-        { default: string | null; optional: boolean; originalName: string }
+        {
+            default: string | null;
+            required: boolean;
+            originalName: string;
+            secret: boolean;
+            type: string;
+        }
     >
 ): string {
-    const header = `| Code | Envar | Default | Optional |
-| ----------------------- | -------------- | --------- | -------- |`;
+    const header = `| Code | Envar | Type | Default | Required |
+| ----------------------- | -------------- | --------- | --------- | -------- |`;
 
-    const rows = Object.entries(group).map(([envVar, { default: def, optional, originalName }]) => {
-        const code = `settings.${section.toLowerCase()}.${originalName}`;
+    const rows = Object.entries(group).map(([envVar, entry]) => {
+        const {
+            default: def,
+            required,
+            originalName,
+            secret,
+            type
+        } = entry;
+
+        const code = `settings.${section.toLowerCase()}.${originalName}` + (secret ? ' (secret)' : '');
         const value = def ?? '';
-        const opt = optional ? 'Yes' : 'No';
-        return `| ${code} | ${envVar} | ${value} | ${opt} |`;
+        const req = required ? 'Yes' : 'No';
+
+        return `| ${code} | ${envVar} | ${type} | ${value} | ${req} |`;
     });
 
-    return `## ${section.toLowerCase()}\n\n${header}\n${rows.join('\n')}\n`;
+    const hasSecrets = Object.values(group).some(entry => entry.secret);
+    const headerLine = `## ${section.toLowerCase()}`;
+    const secretsLine = hasSecrets ? `\n> contains secrets\n` : '';
+
+    return `${headerLine}${secretsLine}\n\n${header}\n${rows.join('\n')}\n`;
 }
 
 export function writeSettingsMarkdown(): void {

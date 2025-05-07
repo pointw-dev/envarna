@@ -28,8 +28,8 @@ export function writeValuesYaml(): void {
     const sectionKey = section.toLowerCase();
     yamlObj[sectionKey] = {};
 
-    for (const [, { default: def, originalName }] of Object.entries(group)) {
-      yamlObj[sectionKey][originalName] = def ?? '--VALUE--';
+    for (const [, { type, default: def, originalName }] of Object.entries(group)) {
+      yamlObj[sectionKey][originalName] = def ?? `{${type}}`;
     }
   }
 
