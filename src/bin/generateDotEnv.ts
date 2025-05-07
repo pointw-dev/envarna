@@ -1,27 +1,26 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import { fileURLToPath } from 'url';
 import { extractEnvSpec, PROJECT_ROOT } from './extractEnvSpec.js';
 
-const envFilename = '.env.template'
-const ENV_OUTPUT = path.join(PROJECT_ROOT, envFilename);
+const envFilename = '.env.sample'
+const OUTPUT_FILE = path.join(PROJECT_ROOT, envFilename);
 
-export function writeEnvFile() {
+export function writeEnvFile(): void {
   const spec = extractEnvSpec();
 
-  const sections: string[] = [];
+  const lines: string[] = [];
+  for (const [, group] of Object.entries(spec)) {
+    const entries = Object.entries(group).filter(([k]) => k !== '_description');
 
-  for (const group of Object.values(spec)) {
-    const lines = Object.entries(group).map(
-      ([envVar, { type, default: def }]) => `${envVar}=${def ?? `{${type}}`}`
-    );
-    sections.push(lines.join('\n'));
+    for (const [envVar, entry] of entries) {
+      if (typeof entry === 'object' && entry !== null) {
+        const def = entry.default ?? `{${entry.type}}`;
+        lines.push(`${envVar}=${def}`);
+      }
+    }
+    lines.push('');
   }
 
-  fs.writeFileSync(ENV_OUTPUT, sections.join('\n\n') + '\n');
-  console.log(`${envFilename} written to ${ENV_OUTPUT}`);
-}
-
-if (process.argv[1] === fileURLToPath(import.meta.url)) {
-  writeEnvFile();
+  fs.writeFileSync(OUTPUT_FILE, lines.join('\n'));
+  console.log(`${envFilename} written to ${OUTPUT_FILE}`);
 }

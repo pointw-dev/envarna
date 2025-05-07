@@ -1,43 +1,28 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import { fileURLToPath } from 'url';
 import { extractEnvSpec, PROJECT_ROOT } from './extractEnvSpec.js';
+import { camelCase } from 'change-case';
 
-const __filename = fileURLToPath(import.meta.url);
-const VALUES_OUTPUT = path.join(PROJECT_ROOT, 'values.yaml');
+const OUTPUT_FILE = path.join(PROJECT_ROOT, 'values.yaml');
 
-function toYaml(obj: Record<string, any>, indent = 0): string {
-  const pad = '  '.repeat(indent);
-  const entries = Object.entries(obj);
-  return entries
-      .map(([key, val], index) => {
-        const yaml =
-            typeof val === 'object' && val !== null
-                ? `${pad}${key}:\n${toYaml(val, indent + 1)}`
-                : `${pad}${key}: ${typeof val === 'string' ? `"${val}"` : val}`;
-        return yaml + (index < entries.length - 1 && indent === 0 ? '\n' : '');
-      })
-      .join('\n');
-}
 export function writeValuesYaml(): void {
   const spec = extractEnvSpec();
-
-  const yamlObj: Record<string, Record<string, string | number>> = {};
+  const lines: string[] = [];
 
   for (const [section, group] of Object.entries(spec)) {
-    const sectionKey = section.toLowerCase();
-    yamlObj[sectionKey] = {};
+    lines.push(`${section.toLowerCase()}:`);
+    const entries = Object.entries(group).filter(([k]) => k !== '_description');
 
-    for (const [, { type, default: def, originalName }] of Object.entries(group)) {
-      yamlObj[sectionKey][originalName] = def ?? `{${type}}`;
+    for (const [, entry] of entries) {
+      if (typeof entry === 'object' && entry !== null) {
+        const key = camelCase(entry.originalName);
+        const value = entry.default ?? `{${entry.type}}`;
+        lines.push(`  ${key}: ${value}`);
+      }
     }
+    lines.push('');
   }
 
-  const yamlContent = toYaml(yamlObj) + '\n';
-  fs.writeFileSync(VALUES_OUTPUT, yamlContent);
-  console.log(`values.yaml written to ${VALUES_OUTPUT}`);
-}
-
-if (process.argv[1] === fileURLToPath(import.meta.url)) {
-  writeValuesYaml();
+  fs.writeFileSync(OUTPUT_FILE, lines.join('\n'));
+  console.log(`values.yaml written to ${OUTPUT_FILE}`);
 }

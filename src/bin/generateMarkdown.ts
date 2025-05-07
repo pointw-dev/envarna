@@ -1,9 +1,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import { fileURLToPath } from 'url';
 import { extractEnvSpec, PROJECT_ROOT } from './extractEnvSpec.js';
 
-const __filename = fileURLToPath(import.meta.url);
 const OUTPUT_FILE = path.join(PROJECT_ROOT, 'SETTINGS.md');
 
 function toMarkdownTable(
@@ -23,12 +21,12 @@ function toMarkdownTable(
     const description = group._description ?? null;
     const entries = Object.entries(group).filter(([k]) => k !== '_description');
 
-    const header = `| Code | Envar | Type | Default |
-| ----------------------- | -------------- | ------------------ | --------- |`;
+    const header = `| Envar | Code | Type | Default |
+| -------------- | ----------------------- | ------------------ | --------- |`;
 
     const rows = entries.map(([envVar, entry]) => {
-        const code = `settings.${section.toLowerCase()}.${entry.originalName}` + (entry.secret ? ' (secret)' : '');
-        return `| ${code} | ${envVar} | ${entry.type} | ${entry.default ?? ''} |`;
+        const code = `settings.${section.toLowerCase()}.${entry.originalName}`;
+        return `| ${envVar + (entry.secret ? ' (secret)' : '')} | ${code} | ${entry.type} | ${entry.default ?? ''} |`;
     });
 
     const hasSecrets = entries.some(([, entry]) => entry.secret);
@@ -63,8 +61,4 @@ export function writeSettingsMarkdown(): void {
     const doc = '# Settings\n\n' + sections + '\n';
     fs.writeFileSync(OUTPUT_FILE, doc);
     console.log(`SETTINGS.md written to ${OUTPUT_FILE}`);
-}
-
-if (process.argv[1] === fileURLToPath(import.meta.url)) {
-    writeSettingsMarkdown();
 }

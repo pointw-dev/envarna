@@ -1,5 +1,4 @@
 import { extractEnvSpec } from './extractEnvSpec.js';
-import { fileURLToPath } from 'url';
 
 function padRight(value: string, width: number): string {
     return value + ' '.repeat(width - value.length);
@@ -9,46 +8,29 @@ export function printSettings(): void {
     const spec = extractEnvSpec();
 
     for (const [section, group] of Object.entries(spec)) {
+        const entries = Object.entries(group).filter(([k]) => k !== '_description');
+
         const rows: string[][] = [];
+        rows.push(['Envar', 'Code', 'Type', 'Default']);
+        rows.push(['--------------', '-----------------------', '--------------', '--------']);
 
-        // Header and rule
-        rows.push(['Code', 'Envar', 'Type', 'Default']);
-        rows.push(['-----------------------', '--------------', '------------------', '---------']);
-
-        for (const [envVar, { default: def, originalName, secret, type }] of Object.entries(group)) {
-            rows.push([
-                `settings.${section.toLowerCase()}.${originalName}${secret ? ' (secret)' : ''}`,
-                envVar,
-                type,
-                def ?? '',
-            ]);
+        for (const [envVar, entry] of entries) {
+            if (typeof entry === 'object' && entry !== null) {
+                const code = `settings.${section.toLowerCase()}.${entry.originalName}`;
+                rows.push([envVar + (entry.secret ? ' (secret)' : ''), code, entry.type, entry.default ?? '']);
+            }
         }
 
-        // Determine column widths
-        const colWidths = rows[0].map((_, colIndex) =>
-            Math.max(...rows.map(row => row[colIndex].length))
-        );
+        const colWidths = rows[0].map((_, i) => Math.max(...rows.map(row => row[i].length)));
+        const hasSecrets = entries.some(([, entry]) => typeof entry === 'object' && entry?.secret);
 
-        // Print section
-        console.log(section.toLowerCase());
+        console.log(section.toLowerCase() + (hasSecrets ? ' (contains secrets)' : ''));
         console.log('='.repeat(section.length));
 
-        const hasSecrets = Object.values(group).some(entry => entry.secret);
-        if (hasSecrets) {
-            console.log('(contains secrets)');
-        }
-
         for (const row of rows) {
-            const line = row
-                .map((value, i) => padRight(value, colWidths[i]))
-                .join(' ');
-            console.log(line);
+            console.log(row.map((val, i) => padRight(val, colWidths[i])).join('  '));
         }
 
-        console.log(); // Blank line between sections
+        console.log();
     }
-}
-
-if (process.argv[1] === fileURLToPath(import.meta.url)) {
-    printSettings();
 }

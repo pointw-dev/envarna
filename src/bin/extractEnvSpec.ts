@@ -153,10 +153,13 @@ export function extractEnvSpec(settingsDir = SETTINGS_DIR): EnvSpec {
 
           const regexMatch = callText.match(/\.regex\((\/.*?\/[gimsuy]*)\)/);
           if (regexMatch) {
-            modifiers.push('[pattern]');
-            fullPattern = regexMatch[1];
+            if (!modifiers.includes('[pattern]')) {
+              modifiers.push('[pattern]');
+            }
+            if (!fullPattern) {
+              fullPattern = regexMatch[1];
+            }
           }
-
 
           if (chain.includes('optional')) modifiers.push('[optional]');
 
@@ -165,7 +168,7 @@ export function extractEnvSpec(settingsDir = SETTINGS_DIR): EnvSpec {
             try {
               const raw = JSON.parse(enumMatch[1].replace(/'/g, '"'));
               if (Array.isArray(raw)) {
-                baseType = `enum(${raw.join(' | ')})`;
+                baseType = `enum(${raw.join(',')})`;
               }
             } catch {
               baseType = 'enum(...)';
