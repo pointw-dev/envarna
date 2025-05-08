@@ -31,7 +31,7 @@ function toMarkdownTable(
     });
 
     const hasSecrets = entries.some(([, entry]) => entry.secret);
-    const sectionHeader = `## ${section.toLowerCase()}`;
+    const sectionHeader = `### ${section.toLowerCase()}`;
     const secretsLine = hasSecrets ? `\n> contains secrets\n` : '';
     const descriptionLine = description ? `\n${description}\n` : '';
 
@@ -39,13 +39,12 @@ function toMarkdownTable(
     const details = entries
         .filter(([, entry]) => entry.description || entry.pattern)
         .map(([envVar, entry]) => {
-            const code = `settings.${section.toLowerCase()}.${entry.originalName}`;
             const lines = [];
 
             if (entry.description) lines.push(entry.description);
             if (entry.pattern) lines.push(`**Pattern:** \`${entry.pattern}\``);
 
-            return `### ${code}\n\n${lines.join('\n\n')}`;
+            return `#### \`${envVar}\`\n\n${lines.join('\n\n')}`;
         });
 
     const extras = details.length > 0 ? `\n\n${details.join('\n\n')}` : '';
@@ -59,7 +58,7 @@ export async function writeSettingsMarkdown(): Promise<void> {
         .map(([section, group]) => toMarkdownTable(section, group))
         .join('\n\n');
 
-    const doc = '# Settings\n\n' + sections + '\n';
+    const doc = '## Settings\n\n' + sections + '\n';
     fs.writeFileSync(OUTPUT_FILE, doc);
     console.log(`SETTINGS.md written to ${OUTPUT_FILE}`);
 }
