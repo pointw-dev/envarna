@@ -10,7 +10,7 @@ import {
 
 import { getFieldSchemas, isSecret } from '../lib/decorators.js';
 import { BaseSettings } from '../lib';
-import { z, ZodTypeAny } from 'zod';
+import { ZodTypeAny } from 'zod';
 import { PROJECT_ROOT, SETTINGS_DIR } from '../lib/paths.js';
 
 export type EnvSpec = Record<
@@ -34,99 +34,25 @@ function toEnvVar(className: string, propName: string): string {
   return `${className.replace(/Settings$/, '').toUpperCase()}_${propName.replace(/([a-z])([A-Z])/g, '$1_$2').toUpperCase()}`;
 }
 
-function getDecoratorCallChain(expr: Expression): string[] {
-  const chain: string[] = [];
-  let current: Expression | undefined = expr;
+function findBaseCallName(expr: Expression): string | null {
+  let current = expr;
 
-  while (current && current.getKindName() === 'CallExpression') {
-    const call = current.asKindOrThrow(ts.SyntaxKind.CallExpression) as CallExpression;
-    const callee = call.getExpression();
+  while (current.getKindName() === 'CallExpression') {
+    const call = current.asKindOrThrow(ts.SyntaxKind.CallExpression);
+    const inner = call.getExpression();
 
-    if (callee.getKindName() === 'PropertyAccessExpression') {
-      const propAccess = callee.asKindOrThrow(ts.SyntaxKind.PropertyAccessExpression) as PropertyAccessExpression;
-      chain.unshift(propAccess.getName());
-      current = propAccess.getExpression();
-    } else if (callee.getKindName() === 'Identifier') {
-      chain.unshift(callee.getText());
-      break;
+    if (inner.getKindName() === 'PropertyAccessExpression') {
+      const access = inner.asKindOrThrow(ts.SyntaxKind.PropertyAccessExpression);
+      const name = access.getName();
+      const base = access.getExpression().getText();
+      if (base === 'v') return name;
+      current = access.getExpression();
     } else {
       break;
     }
   }
 
-  return chain;
-}
-
-function unwrapSchema(schema: ZodTypeAny): ZodTypeAny {
-  const def = schema._def;
-  if (def.typeName === 'ZodEffects') return unwrapSchema(def.schema);
-  if (def.typeName === 'ZodOptional') return unwrapSchema(def.innerType);
-  if (def.typeName === 'ZodNullable') return unwrapSchema(def.innerType);
-  if (def.typeName === 'ZodDefault') return unwrapSchema(def.innerType);
-  return schema;
-}
-
-function inferZodType(schema: ZodTypeAny): { type: string; pattern: string | null } {
-  const unwrapped = unwrapSchema(schema);
-  const def = unwrapped._def;
-
-  const modifiers: string[] = [];
-  let baseType = 'unknown';
-  let pattern: string | null = null;
-
-  switch (def.typeName) {
-    case 'ZodString':
-      baseType = 'string';
-      if (def.checks) {
-        for (const check of def.checks) {
-          if (check.kind === 'min') modifiers.push(`>= ${check.value}`);
-          if (check.kind === 'max') modifiers.push(`<= ${check.value}`);
-          if (check.kind === 'regex') {
-            modifiers.push('[pattern]');
-            pattern = check.regex.toString();
-          }
-          if (check.kind === 'email') modifiers.push('email');
-          if (check.kind === 'url') modifiers.push('url');
-        }
-      }
-      break;
-
-    case 'ZodNumber':
-      baseType = 'number';
-      if (def.checks) {
-        for (const check of def.checks) {
-          if (check.kind === 'min') modifiers.push(`>= ${check.value}`);
-          if (check.kind === 'max') modifiers.push(`<= ${check.value}`);
-          if (check.kind === 'gt') modifiers.push(`> ${check.value}`);
-          if (check.kind === 'lt') modifiers.push(`< ${check.value}`);
-        }
-      }
-      break;
-
-    case 'ZodBoolean':
-      baseType = 'boolean';
-      break;
-
-    case 'ZodDate':
-      baseType = 'date';
-      break;
-
-    case 'ZodEnum':
-      baseType = `enum(${(def as any).values.join(',')})`;
-      break;
-
-    case 'ZodArray':
-      baseType = 'array';
-      break;
-
-    default:
-      baseType = 'unknown';
-  }
-
-  return {
-    type: [baseType, ...modifiers].join(' ').trim(),
-    pattern,
-  };
+  return null;
 }
 
 export async function extractEnvSpec(settingsDir = SETTINGS_DIR): Promise<EnvSpec> {
@@ -164,9 +90,11 @@ export async function extractEnvSpec(settingsDir = SETTINGS_DIR): Promise<EnvSpe
         }
 
         instance = new Ctor();
-      } catch (err) {
-        console.warn(`[envarna] Failed to import .ts file ${tsPath}:`, err);
-        instance = Object.create(null);
+      } catch (err: any) {
+        if (err?.code !== 'ERR_UNKNOWN_FILE_EXTENSION') {
+          console.warn(`[envarna] Failed to import ${tsPath}:`, err);
+        }
+        instance = Object.create(null);        instance = Object.create(null);
       }
 
       const runtimeSchemas = instance.constructor ? getFieldSchemas(instance.constructor) : {};
@@ -192,26 +120,35 @@ export async function extractEnvSpec(settingsDir = SETTINGS_DIR): Promise<EnvSpe
           const callExpr = decorator.getCallExpression();
           if (!callExpr) continue;
 
-          const chain = getDecoratorCallChain(callExpr);
+          const expr = callExpr.getExpression();
+          if (expr.getKindName() === 'PropertyAccessExpression') {
+            const access = expr.asKindOrThrow(ts.SyntaxKind.PropertyAccessExpression);
+            const method = access.getName();
+            const receiver = access.getExpression().getText();
+
+            if (receiver === 'setting') {
+              if (method === 'string') baseType = 'string';
+              else if (method === 'number') baseType = 'number';
+              else if (method === 'boolean') baseType = 'boolean';
+              else if (method === 'date') baseType = 'date';
+              else if (method === 'array') baseType = 'array';
+              else if (method === 'object') baseType = 'object';
+            }
+          }
+
+          // ✅ Handle @setting(v.enum([...])) and v.array() cases
+          const firstArg = callExpr.getArguments()[0];
+          if (firstArg?.getKindName() === 'CallExpression') {
+            const detected = findBaseCallName(firstArg as Expression);
+            if (detected === 'enum') {
+              baseType = 'enum(...)'; // default placeholder, replaced below
+            } else if (detected) {
+              baseType = detected;
+            }
+          }
+
           const callText = callExpr.getText();
 
-// base types
-          if (chain.includes('string')) baseType = 'string';
-          if (chain.includes('number')) baseType = 'number';
-          if (chain.includes('boolean')) baseType = 'boolean';
-          if (chain.includes('array')) baseType = 'array';
-          if (chain.includes('date')) baseType = 'date';
-
-          const exprText = callExpr.getArguments()[0]?.getText() ?? '';
-
-          if (exprText.includes('v.string(')) baseType = 'string';
-          if (exprText.includes('v.number(')) baseType = 'number';
-          if (exprText.includes('v.boolean(')) baseType = 'boolean';
-          if (exprText.includes('v.date(')) baseType = 'date';
-          if (exprText.includes('v.array(')) baseType = 'array';
-          if (exprText.includes('v.object(')) baseType = 'object';
-
-// refinements
           const minMatch = callText.match(/\.min\((\d+)\)/);
           if (minMatch) chainModifiers.push(`>= ${minMatch[1]}`);
 
@@ -243,7 +180,7 @@ export async function extractEnvSpec(settingsDir = SETTINGS_DIR): Promise<EnvSpe
           if (callText.includes('.optional()')) chainModifiers.push('[optional]');
           if (callText.includes('.nullable()')) chainModifiers.push('nullable');
 
-
+          // ✅ If we detected enum(...) above, parse its actual values
           const enumMatch = callText.match(/\.enum\((\[[^\]]+\])\)/);
           if (enumMatch) {
             try {
@@ -257,16 +194,9 @@ export async function extractEnvSpec(settingsDir = SETTINGS_DIR): Promise<EnvSpe
           }
         }
 
-        let type = [baseType, ...chainModifiers].join(' ').trim();
-        let pattern = fullPattern;
 
-        if (runtimeSchemas[name]) {
-          const { type: rtType, pattern: rtPattern } = inferZodType(runtimeSchemas[name]);
-          if (rtType !== 'unknown') {
-            type = rtType;
-            pattern = pattern ?? rtPattern;
-          }
-        }
+        const type = [baseType, ...chainModifiers].join(' ').trim();
+        const pattern = fullPattern;
 
         group[envVar] = {
           default: defaultValue,

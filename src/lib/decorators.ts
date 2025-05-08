@@ -28,14 +28,28 @@ setting.array = <T extends ZodTypeAny = z.ZodString>(itemSchema?: T) =>
 setting.object = <T extends Record<string, ZodTypeAny>>(shape: T) =>
     setting(z.object(shape));
 
+// --- Environment-friendly wrapper ---
+function parseIfString(val: unknown): unknown {
+  if (typeof val === 'string') {
+    try {
+      return JSON.parse(val);
+    } catch {
+      return val;
+    }
+  }
+  return val;
+}
+
 // Alternate namespace for fully coercing Zod schemas
 export const v = {
   string: z.string,
   number: z.coerce.number,
   boolean: z.coerce.boolean,
   date: z.coerce.date,
-  array: z.array,
   object: z.object,
+  enum: <T extends string>(values: [T, ...T[]]) => z.enum(values),
+  array: <T extends ZodTypeAny = z.ZodString>(itemSchema?: T) =>
+      z.preprocess(parseIfString, z.array(itemSchema ?? z.string())),
 };
 
 // Marks a field as secret (for doc generation)
