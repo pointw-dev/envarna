@@ -67,8 +67,8 @@ export function isSecret(target: any, propertyKey: string): boolean {
 export function pushToEnv(): PropertyDecorator {
   return (target: any, propertyKey: string | symbol) => {
     const className = target.constructor.name;
-    const envVarName = toEnvVar(className, propertyKey.toString());
-    Reflect.defineMetadata('envarna:pushToEnv', envVarName, target, propertyKey.toString());
+    const envar = toEnvVar(className, propertyKey.toString());
+    Reflect.defineMetadata('envarna:pushToEnv', envar, target, propertyKey.toString());
   };
 }
 

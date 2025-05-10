@@ -14,10 +14,10 @@ export async function printSettings(): Promise<void> {
         rows.push(['Envar', 'Code', 'Type', 'Default']);
         rows.push(['--------------', '-----------------------', '--------------', '--------']);
 
-        for (const [envVar, entry] of entries) {
+        for (const [envar, entry] of entries) {
             if (typeof entry === 'object' && entry !== null) {
                 const code = `settings.${section.toLowerCase()}.${entry.originalName}`;
-                rows.push([envVar + (entry.secret ? ' (secret)' : ''), code, entry.type, entry.default ?? '']);
+                rows.push([envar + (entry.secret ? ' (secret)' : ''), code, entry.type, entry.default ?? '']);
             }
         }
 

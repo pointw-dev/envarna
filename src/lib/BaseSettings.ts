@@ -68,9 +68,10 @@ export class BaseSettings {
     Object.assign(instance, parsed.data);
 
     for (const key of Object.keys(instance)) {
-      const envVarName = Reflect.getMetadata('envarna:pushToEnv', instance, key);
-      if (envVarName) {
-        process.env[envVarName] = String((instance as any)[key]);
+      const envar = Reflect.getMetadata('envarna:pushToEnv', instance, key);
+      const value = String((instance as any)[key])
+      if (envar && value.length > 0) {
+        process.env[envar] = String((instance as any)[key]);
       }
     }
 

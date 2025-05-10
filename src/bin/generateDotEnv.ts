@@ -3,7 +3,7 @@ import * as path from 'path';
 import { extractEnvSpec } from './extractEnvSpec.js';
 import { PROJECT_ROOT } from '../lib/paths.js';
 
-const envFilename = '.env.sample'
+const envFilename = '.env.template'
 const OUTPUT_FILE = path.join(PROJECT_ROOT, envFilename);
 
 export async function writeEnvFile(): Promise<void> {
@@ -13,10 +13,10 @@ export async function writeEnvFile(): Promise<void> {
   for (const [, group] of Object.entries(spec)) {
     const entries = Object.entries(group).filter(([k]) => k !== '_description');
 
-    for (const [envVar, entry] of entries) {
+    for (const [envar, entry] of entries) {
       if (typeof entry === 'object' && entry !== null) {
         const def = entry.default ?? `{${entry.type}}`;
-        lines.push(`${envVar}=${def}`);
+        lines.push(`${envar}=${def}`);
       }
     }
     lines.push('');

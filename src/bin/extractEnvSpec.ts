@@ -106,7 +106,7 @@ export async function extractEnvSpec(settingsDir = SETTINGS_DIR): Promise<EnvSpe
             ? initializer.getText().replace(/^['"`](.*)['"`]$/, '$1')
             : null;
 
-        const envVar = toEnvVar(className, name);
+        const envar = toEnvVar(className, name);
         const decorators = prop.getDecorators();
         const isSecret = decorators.some(d => d.getName() === 'secret');
         const fieldComment = prop.getJsDocs()[0]?.getComment();
@@ -198,7 +198,7 @@ export async function extractEnvSpec(settingsDir = SETTINGS_DIR): Promise<EnvSpe
         const type = [baseType, ...chainModifiers].join(' ').trim();
         const pattern = fullPattern;
 
-        group[envVar] = {
+        group[envar] = {
           default: defaultValue,
           originalName: name,
           secret: isSecret,

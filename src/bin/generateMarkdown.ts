@@ -25,9 +25,9 @@ function toMarkdownTable(
     const header = `| Envar | Code | Type | Default |
 | -------------- | ----------------------- | ------------------ | --------- |`;
 
-    const rows = entries.map(([envVar, entry]) => {
+    const rows = entries.map(([envar, entry]) => {
         const code = `settings.${section.toLowerCase()}.${entry.originalName}`;
-        return `| ${envVar + (entry.secret ? ' (secret)' : '')} | ${code} | ${entry.type} | ${entry.default ?? ''} |`;
+        return `| ${envar + (entry.secret ? ' (secret)' : '')} | ${code} | ${entry.type} | ${entry.default ?? ''} |`;
     });
 
     const hasSecrets = entries.some(([, entry]) => entry.secret);
@@ -38,13 +38,13 @@ function toMarkdownTable(
     // Add field-level detail blocks
     const details = entries
         .filter(([, entry]) => entry.description || entry.pattern)
-        .map(([envVar, entry]) => {
+        .map(([envar, entry]) => {
             const lines = [];
 
             if (entry.description) lines.push(entry.description);
             if (entry.pattern) lines.push(`**Pattern:** \`${entry.pattern}\``);
 
-            return `#### \`${envVar}\`\n\n${lines.join('\n\n')}`;
+            return `#### \`${envar}\`\n\n${lines.join('\n\n')}`;
         });
 
     const extras = details.length > 0 ? `\n\n${details.join('\n\n')}` : '';
