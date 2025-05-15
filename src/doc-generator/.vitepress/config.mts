@@ -1,6 +1,6 @@
 import { defineConfig, withBase } from 'vitepress'
 import { fileURLToPath, URL } from 'node:url'
-// const pkg = require('../../version_stamp.json')
+const pkg = require('../../package.json')
 
 
 const hostname = 'https://pointw-dev.github.io/envarna'
@@ -22,14 +22,14 @@ export default defineConfig({
     stackOverflowTags: ['envarna', 'settings', 'validation'],
 
     socialLinks: [
-      { icon: 'github', link: 'https://github.com/pointw-dev' }
+      { icon: 'github', link: 'https://github.com/pointw-dev/envarna' }
     ],
     logo: '/img/hero.svg',
 
     nav: [
       { text: 'Home', link: '/' },
       { text: 'Quickstart', link: '/introduction/quickstart' },
-      // { text: pkg.version, link: null }
+      { text: pkg.version, link: null }
     ],
 
     outline: 'deep',
@@ -42,7 +42,7 @@ export default defineConfig({
     },
     footer:{
       message: 'Released under the <a target="_blank" class="link" href="https://raw.githubusercontent.com/pointw-dev/hypermea/refs/heads/main/LICENSE">MIT License</a>.',
-      copyright: 'Copyright © 2019-2025 Michael Ottoson (pointw.com)'
+      copyright: 'Copyright © 2025 Michael Ottoson (pointw.com)'
     }
   },
 

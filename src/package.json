@@ -1,7 +1,13 @@
 {
   "name": "envarna",
-  "version": "0.3.12",
-  "description": "Settings managed. A flexible library for configuration details.",
+  "version": "0.3.14",
+  "description": "Settings managed. A powerful library for managing configuration details.",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/pointw-dev/envarna"
+  },
+  "homepage": "",
+  "keywords": [],
   "main": "dist/index.js",
   "type": "module",
   "types": "dist/index.d.ts",

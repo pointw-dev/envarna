@@ -2,7 +2,7 @@ import { z, ZodObject, ZodRawShape, ZodTypeAny } from "zod";
 import 'reflect-metadata';
 import dotenv from "dotenv";
 import { extractPrefixedEnv } from "./utils.js";
-import { getFieldSchemas, isSecret } from "./decorators.js";
+import {getAliases, getFieldSchemas, isSecret} from "./decorators.js";
 import { DOTENV_PATH } from "./paths.js";
 
 export class BaseSettings {
@@ -56,7 +56,22 @@ export class BaseSettings {
       dotenv.config({ path: DOTENV_PATH });
       // Does not override existing process.env values
       const prefix = this.name.replace(/Settings$/, '').toUpperCase() + '_';
+
+      // const rawEnv = extractPrefixedEnv(prefix, process.env);
+      // merged = { ...defaults, ...rawEnv };
+
+
       const rawEnv = extractPrefixedEnv(prefix, process.env);
+      const overrides = getAliases(this);
+
+      // Apply explicitly mapped env vars
+      for (const [key, envvar] of Object.entries(overrides)) {
+        const val = process.env[envvar];
+        if (val !== undefined) {
+          rawEnv[key] = val;
+        }
+      }
+
       merged = { ...defaults, ...rawEnv };
     }
 

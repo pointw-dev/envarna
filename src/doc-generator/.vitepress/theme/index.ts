@@ -19,7 +19,7 @@ export default {
       // https://vitepress.dev/guide/extending-default-theme#layout-slots
       'doc-footer-before': () => h(AskStackOverflow, { frontmatter, theme }),
       'not-found': () => h(NotFound),
-      'doc-after': () => h(Copyright, { message: '2023-2025 Michael Ottoson (pointw.com)'})
+      'doc-after': () => h(Copyright, { message: '2025 Michael Ottoson (pointw.com)'})
     })
   },
   

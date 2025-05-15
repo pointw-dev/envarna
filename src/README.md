@@ -86,6 +86,11 @@ import { settings } from './settings'
 ````
 then when you need a settings value, you use a POJO, e.g. `settings.smtp.host`
 
+## Zod validation for settings
+`z` vs `v`
+* https://zod.dev/?id=strings
+* https://zod.dev/?id=numbers
+* etc
 
 ## Command Line Interface
 
