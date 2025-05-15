@@ -5,6 +5,8 @@
 > **Settings managed.**  
 
 ## Why envarna?
+> NOTE: docs are still under heavy revision - both this README and the docs site.  Real docs coming soon.
+
 The main benefits of envarna over, say, plain-jane dotenv are:
 
 * Types

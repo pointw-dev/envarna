@@ -6,8 +6,12 @@
     "type": "git",
     "url": "https://github.com/pointw-dev/envarna"
   },
-  "homepage": "",
-  "keywords": [],
+  "homepage": "https://pointw-dev.github.io/envarna",
+  "keywords": [
+    "settings",
+    "dotenv",
+    "zod"
+  ],
   "main": "dist/index.js",
   "type": "module",
   "types": "dist/index.d.ts",
