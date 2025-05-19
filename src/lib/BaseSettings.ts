@@ -6,6 +6,9 @@ import {getAliases, getFieldSchemas, isSecret} from "./decorators.js";
 import { DOTENV_PATH } from "./paths.js";
 
 export class BaseSettings {
+  /** Holds test override values, if any. */
+  private static _testOverrides: Map<Function, Record<string, unknown>> = new Map();
+
   /**
    * Subclasses can override this to hook into the Zod schema before validation.
    * Used for `.superRefine()` or other advanced schema manipulations.
@@ -24,14 +27,25 @@ export class BaseSettings {
   }
 
   /**
+   * Overrides values for testing. Must be called before `.load()`.
+   */
+  static overrideForTest<T extends typeof BaseSettings>(this: T, values: Record<string, unknown>): void {
+    BaseSettings._testOverrides.set(this, values);
+  }
+
+  /**
+   * Clears any test override values.
+   */
+  static clearOverride<T extends typeof BaseSettings>(this: T): void {
+    BaseSettings._testOverrides.delete(this);
+  }
+
+  /**
    * Loads a settings instance by validating and merging values from one of two sources:
    *
-   * - If `values` is provided, those values are used directly (bypassing `.env` and `process.env`).
-   * - If `values` is omitted, values are loaded from environment variables (after `dotenv.config()`),
-   *   filtered by a prefix derived from the class name (e.g., `SMTP_` for `SmtpSettings`).
-   *
-   * Field schemas must be registered using the `@setting(...)` decorator.
-   * You may use either `@setting.string()` style or full zod schemas: `@setting(z.string().min(3))`
+   * - If test overrides exist, they are used.
+   * - Else if `values` is provided, those values are used directly.
+   * - Else values are loaded from environment variables.
    */
   static load<T extends typeof BaseSettings>(
       this: T,
@@ -48,9 +62,12 @@ export class BaseSettings {
     const instance = new this() as InstanceType<T>;
     const defaults = Object.fromEntries(Object.entries(instance));
 
+    const testOverride = BaseSettings._testOverrides.get(this);
     let merged: Record<string, unknown> = {};
 
-    if (values) {
+    if (testOverride) {
+      merged = { ...defaults, ...testOverride };
+    } else if (values) {
       merged = { ...defaults, ...values };
     } else {
       dotenv.config({ path: DOTENV_PATH });

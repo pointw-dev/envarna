@@ -8,7 +8,7 @@ import {
   PropertyAccessExpression,
 } from 'ts-morph';
 
-import { getFieldSchemas, isSecret } from '../lib/decorators.js';
+import { getFieldSchemas, isSecret, getAliases } from '../lib/decorators.js';
 import { BaseSettings } from '../lib';
 import { ZodTypeAny } from 'zod';
 import { PROJECT_ROOT, SETTINGS_DIR } from '../lib/paths.js';
@@ -17,6 +17,7 @@ export type EnvSpec = Record<
     string,
     {
       _description?: string | null;
+      _hasAlias?: boolean;
     } & Record<
     string,
     {
@@ -26,6 +27,7 @@ export type EnvSpec = Record<
       type: string;
       description: string | null;
       pattern: string | null;
+      alias?: string; // <-- Add this line
     }
 >
 >;
@@ -94,10 +96,13 @@ export async function extractEnvSpec(settingsDir = SETTINGS_DIR): Promise<EnvSpe
         if (err?.code !== 'ERR_UNKNOWN_FILE_EXTENSION') {
           console.warn(`[envarna] Failed to import ${tsPath}:`, err);
         }
-        instance = Object.create(null);        instance = Object.create(null);
+        instance = Object.create(null);
       }
 
       const runtimeSchemas = instance.constructor ? getFieldSchemas(instance.constructor) : {};
+      // aliasMap no longer needed for static analysis
+
+      let anyHasAlias = false;
 
       for (const prop of cls.getProperties()) {
         const name = prop.getName();
@@ -198,6 +203,21 @@ export async function extractEnvSpec(settingsDir = SETTINGS_DIR): Promise<EnvSpe
         const type = [baseType, ...chainModifiers].join(' ').trim();
         const pattern = fullPattern;
 
+        let alias: string | null = null;
+
+        for (const decorator of decorators) {
+          if (decorator.getName() === 'alias') {
+            const callExpr = decorator.getCallExpression();
+            if (callExpr) {
+              const args = callExpr.getArguments();
+              if (args.length > 0) {
+                alias = args[0].getText().replace(/^['"`](.*)['"`]$/, '$1');
+              }
+            }
+          }
+        }
+        if (alias) anyHasAlias = true;
+
         group[envar] = {
           default: defaultValue,
           originalName: name,
@@ -205,11 +225,15 @@ export async function extractEnvSpec(settingsDir = SETTINGS_DIR): Promise<EnvSpe
           type,
           description,
           pattern,
+          ...(alias ? {alias} : {})
         };
       }
 
       if (classComment) {
         (group as any)._description = classComment;
+      }
+      if (anyHasAlias) {
+        (group as any)._hasAlias = true;
       }
 
       result[prefix] = group;

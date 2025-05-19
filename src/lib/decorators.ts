@@ -73,9 +73,17 @@ export function isSecret(target: any, propertyKey: string): boolean {
 }
 
 export function getAliases(klass: Function): Record<string, string> {
-  return aliases.get(klass) || {};
-}
+  const result: Record<string, string> = {};
+  let current: any = klass;
 
+  while (current && current !== Function.prototype) {
+    const local = aliases.get(current);
+    if (local) Object.assign(result, local);
+    current = Object.getPrototypeOf(current);
+  }
+
+  return result;
+}
 
 
 // Registers the Zod schema for a decorated field
@@ -102,5 +110,3 @@ function parseIfString(val: unknown): unknown {
 export function getFieldSchemas(klass: Function): Record<string, ZodTypeAny> {
   return fieldMetadata.get(klass) || {};
 }
-
-

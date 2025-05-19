@@ -1,16 +1,18 @@
+// bin/generateYaml.ts
 import { extractEnvSpec } from './extractEnvSpec.js';
 import yaml from 'yaml';
 
-export async function generateYaml(root: string = 'settings', flat = false): Promise<string> {
+export async function generateYaml(root: string = 'settings', flat = false, useCodeAsKey = false): Promise<string> {
   const spec = await extractEnvSpec();
   const output: Record<string, any> = {};
   output[root] = {};
 
   for (const [group, vars] of Object.entries(spec)) {
-    for (const [key, meta] of Object.entries(vars)) {
-      if (key === '_description') continue;
-      if (typeof meta === 'string' || meta == null) continue;
+    for (const [envar, meta] of Object.entries(vars)) {
+      if (envar.startsWith('_')) continue;
+      if (typeof meta !== 'object' || meta == null || !('default' in meta)) continue;
 
+      const yamlKey = useCodeAsKey ? meta.originalName : meta.alias ?? envar;
       let value: any;
 
       if (meta.default != null) {
@@ -52,11 +54,11 @@ export async function generateYaml(root: string = 'settings', flat = false): Pro
       }
 
       if (flat) {
-        output[root][key] = value;
+        output[root][yamlKey] = value;
       } else {
         const groupKey = group.toLowerCase();
         output[root][groupKey] ??= {};
-        output[root][groupKey][key] = value;
+        output[root][groupKey][yamlKey] = value;
       }
     }
   }

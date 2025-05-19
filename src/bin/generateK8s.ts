@@ -7,9 +7,10 @@ export async function generateK8s(): Promise<string> {
 
   for (const vars of Object.values(spec)) {
     for (const [key, meta] of Object.entries(vars)) {
-      if (key === '_description') continue;
-      if (typeof meta === 'string' || meta == null) continue;
+      if (key.startsWith('_')) continue;
+      if (typeof meta !== 'object' || meta == null || !('default' in meta)) continue;
 
+      const name = meta.alias ?? key;
       let rawValue: string;
 
       if (meta.default != null) {
@@ -46,7 +47,7 @@ export async function generateK8s(): Promise<string> {
       }
 
       envList.push({
-        name: key,
+        name,
         value: rawValue,
       });
     }

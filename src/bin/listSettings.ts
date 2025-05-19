@@ -8,23 +8,32 @@ export async function printSettings(): Promise<void> {
     const spec = await extractEnvSpec();
 
     for (const [section, group] of Object.entries(spec)) {
-        const entries = Object.entries(group).filter(([k]) => k !== '_description');
+        const entries = Object.entries(group).filter(([k]) => k !== '_description' && k !== '_hasAlias');
+        const hasAlias = '_hasAlias' in group;
 
         const rows: string[][] = [];
-        rows.push(['Envar', 'Code', 'Type', 'Default']);
-        rows.push(['--------------', '-----------------------', '--------------', '--------']);
+        const header = ['Envar', ...(hasAlias ? ['Alias'] : []), 'Code', 'Type', 'Default'];
+        rows.push(header);
+        rows.push(header.map(h => '-'.repeat(h.length)));
 
         for (const [envar, entry] of entries) {
             if (typeof entry === 'object' && entry !== null) {
                 const code = `settings.${section.toLowerCase()}.${entry.originalName}`;
-                rows.push([envar + (entry.secret ? ' (secret)' : ''), code, entry.type, entry.default ?? '']);
+                const row = [
+                    envar + (entry.secret ? ' (secret)' : ''),
+                    ...(hasAlias ? [entry.alias ?? ''] : []),
+                    code,
+                    entry.type,
+                    entry.default ?? ''
+                ];
+                rows.push(row);
             }
         }
 
         const colWidths = rows[0].map((_, i) => Math.max(...rows.map(row => row[i].length)));
-        const hasSecrets = entries.some(([, entry]) => typeof entry === 'object' && entry?.secret);
+        const containsSecrets = entries.some(([, entry]) => typeof entry === 'object' && entry?.secret);
 
-        console.log(section.toLowerCase() + (hasSecrets ? ' (contains secrets)' : ''));
+        console.log(section.toLowerCase() + (containsSecrets ? ' (contains secrets)' : ''));
         console.log('='.repeat(section.length));
 
         for (const row of rows) {

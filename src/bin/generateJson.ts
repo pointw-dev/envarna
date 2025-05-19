@@ -1,13 +1,13 @@
 import { extractEnvSpec } from './extractEnvSpec.js';
 
-export async function generateJson(root: string | null = null, flat = false): Promise<string> {
+export async function generateJson(root: string | null = null, flat = false, useCodeAsKey = false): Promise<string> {
   const spec = await extractEnvSpec();
   const output: any = root ? { [root]: {} } : {};
 
   for (const [group, vars] of Object.entries(spec)) {
-    for (const [key, meta] of Object.entries(vars)) {
-      if (key === '_description') continue;
-      if (typeof meta === 'string' || meta == null) continue;
+    for (const [envar, meta] of Object.entries(vars)) {
+      if (envar.startsWith('_')) continue;
+      if (typeof meta !== 'object' || meta == null || !('default' in meta)) continue;
 
       let value: any;
 
@@ -49,16 +49,18 @@ export async function generateJson(root: string | null = null, flat = false): Pr
         value = `{${meta.type}}`;
       }
 
+      const outputKey = useCodeAsKey ? meta.originalName : meta.alias ?? envar;
+
       if (flat && root) {
-        output[root][key] = value;
+        output[root][outputKey] = value;
       } else if (flat && !root) {
-        output[key] = value;
+        output[outputKey] = value;
       } else if (root) {
         output[root][group.toLowerCase()] ??= {};
-        output[root][group.toLowerCase()][key] = value;
+        output[root][group.toLowerCase()][outputKey] = value;
       } else {
         output[group.toLowerCase()] ??= {};
-        output[group.toLowerCase()][key] = value;
+        output[group.toLowerCase()][outputKey] = value;
       }
     }
   }

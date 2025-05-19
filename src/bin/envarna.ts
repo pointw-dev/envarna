@@ -14,6 +14,7 @@ import { writeComposeEnvFile } from './generateCompose.js'
 import { generateJson } from './generateJson.js'
 import { generateYaml } from './generateYaml.js'
 import { generateK8s } from './generateK8s.js'
+import { writeRawEnvSpec } from "./generateRaw.js";
 
 // Locate package.json relative to *compiled* file (e.g., dist/bin/envarna.js)
 const __filename = fileURLToPath(import.meta.url)
@@ -59,9 +60,14 @@ yargs(hideBin(process.argv))
         type: 'boolean',
         describe: 'Flatten the output under root (no group nesting)',
         default: false,
+    })
+    .option('code', {
+      type: 'boolean',
+      describe: 'Use the camelCase class field, not the envar',
+      default: false,
     }),
     async argv => {
-      const output = await generateJson(argv.root ?? null, argv.flat);
+      const output = await generateJson(argv.root ?? null, argv.flat, argv.code);
       console.log(output);
     }
   )
@@ -77,13 +83,21 @@ yargs(hideBin(process.argv))
         type: 'boolean',
         describe: 'Flatten the output under root (no group nesting)',
         default: false,
+    })
+    .option('code', {
+        type: 'boolean',
+        describe: 'Use the camelCase class field, not the envar',
+        default: false,
     }),
     async argv => {
-      const output = await generateYaml(argv.root, argv.flat);
+      const output = await generateYaml(argv.root, argv.flat, argv.code);
       console.log(output);
     }
   )
-
+  .command('raw', 'Display the raw structure extracted from the settings classes used to power the other formats', () => {}, async () => {
+    const output = await writeRawEnvSpec();
+    console.log(output);
+  })
   .demandCommand()
   .strict()
   .help()

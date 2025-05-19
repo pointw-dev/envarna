@@ -5,29 +5,45 @@ import { PROJECT_ROOT } from '../lib/paths.js';
 
 const OUTPUT_FILE = path.join(PROJECT_ROOT, 'SETTINGS.md');
 
-function toMarkdownTable(
-    section: string,
-    group: Record<
-        string,
-        {
-            default: string | null;
-            originalName: string;
-            secret: boolean;
-            type: string;
-            description?: string | null;
-            pattern?: string | null;
-        }
-    >
-): string {
-    const description = group._description ?? null;
-    const entries = Object.entries(group).filter(([k]) => k !== '_description');
+type EnvVarSpec = {
+    default: string | null;
+    originalName: string;
+    secret: boolean;
+    type: string;
+    description?: string | null;
+    pattern?: string | null;
+    alias?: string;
+};
 
-    const header = `| Envar | Code | Type | Default |
-| -------------- | ----------------------- | ------------------ | --------- |`;
+type EnvVarGroup = {
+    _description?: string | null;
+    _hasAlias?: boolean;
+} & Record<string, EnvVarSpec | unknown>;  // key point: we acknowledge mixed types
+
+function isEnvVarSpec(entry: unknown): entry is EnvVarSpec {
+    return (
+        typeof entry === 'object' &&
+        entry !== null &&
+        'originalName' in entry &&
+        typeof (entry as any).originalName === 'string'
+    );
+}
+
+function toMarkdownTable(section: string, group: EnvVarGroup): string {
+    const description = group._description ?? null;
+    const hasAlias = group._hasAlias === true;
+
+    const entries = Object.entries(group).filter(
+        ([k, v]) => !k.startsWith('_') && isEnvVarSpec(v)
+    ) as [string, EnvVarSpec][];
+
+    const header = `| Envar |${hasAlias ? ' Alias |' : ''} Code | Type | Default |
+| -------------- |${hasAlias ? ' ------ |' : ''} ----------------------- | ------------------ | --------- |`;
 
     const rows = entries.map(([envar, entry]) => {
         const code = `settings.${section.toLowerCase()}.${entry.originalName}`;
-        return `| ${envar + (entry.secret ? ' (secret)' : '')} | ${code} | ${entry.type} | ${entry.default ?? ''} |`;
+        const aliasCell = hasAlias ? ` ${entry.alias ?? ''} |` : '';
+        return `| ${envar + (entry.secret ? ' (secret)' : '')} |${aliasCell} ${code} | ${entry.type} | ${entry.default ?? ''} |`;
     });
 
     const hasSecrets = entries.some(([, entry]) => entry.secret);
@@ -35,15 +51,12 @@ function toMarkdownTable(
     const secretsLine = hasSecrets ? `\n> contains secrets\n` : '';
     const descriptionLine = description ? `\n${description}\n` : '';
 
-    // Add field-level detail blocks
     const details = entries
         .filter(([, entry]) => entry.description || entry.pattern)
         .map(([envar, entry]) => {
             const lines = [];
-
             if (entry.description) lines.push(entry.description);
             if (entry.pattern) lines.push(`**Pattern:** \`${entry.pattern}\``);
-
             return `#### \`${envar}\`\n\n${lines.join('\n\n')}`;
         });
 

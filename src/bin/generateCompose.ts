@@ -1,5 +1,3 @@
-import * as fs from 'fs';
-import * as path from 'path';
 import { extractEnvSpec } from './extractEnvSpec.js';
 
 export async function writeComposeEnvFile(): Promise<string> {
@@ -7,13 +5,13 @@ export async function writeComposeEnvFile(): Promise<string> {
 
     const lines: string[] = ['environment:'];
     for (const [, group] of Object.entries(spec)) {
-        const entries = Object.entries(group).filter(([k]) => k !== '_description');
+        for (const [envar, entry] of Object.entries(group)) {
+            if (envar.startsWith('_')) continue;
+            if (typeof entry !== 'object' || entry === null || !('default' in entry)) continue;
 
-        for (const [envar, entry] of entries) {
-            if (typeof entry === 'object' && entry !== null) {
-                const def = entry.default ?? `{${entry.type}}`;
-                lines.push(`  ${envar}: ${def}`);
-            }
+            const name = entry.alias ?? envar;
+            const def = entry.default ?? `{${entry.type}}`;
+            lines.push(`  ${name}: ${def}`);
         }
     }
 
