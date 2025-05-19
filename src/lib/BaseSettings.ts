@@ -1,4 +1,4 @@
-import { z, ZodObject, ZodRawShape, ZodTypeAny } from "zod";
+import { z, ZodObject, ZodRawShape, ZodTypeAny, ZodError } from "zod";
 import 'reflect-metadata';
 import dotenv from "dotenv";
 import { extractPrefixedEnv } from "./utils.js";
@@ -54,17 +54,10 @@ export class BaseSettings {
       merged = { ...defaults, ...values };
     } else {
       dotenv.config({ path: DOTENV_PATH });
-      // Does not override existing process.env values
       const prefix = this.name.replace(/Settings$/, '').toUpperCase() + '_';
-
-      // const rawEnv = extractPrefixedEnv(prefix, process.env);
-      // merged = { ...defaults, ...rawEnv };
-
-
       const rawEnv = extractPrefixedEnv(prefix, process.env);
       const overrides = getAliases(this);
 
-      // Apply explicitly mapped env vars
       for (const [key, envvar] of Object.entries(overrides)) {
         const val = process.env[envvar];
         if (val !== undefined) {
@@ -77,7 +70,12 @@ export class BaseSettings {
 
     const parsed = schema.safeParse(merged);
     if (!parsed.success) {
-      throw parsed.error;
+      const className = this.name;
+      const adjustedErrors = parsed.error.errors.map((issue) => ({
+        ...issue,
+        message: `[${className}.${issue.path}] ${issue.message}`,
+      }));
+      throw new ZodError(adjustedErrors);
     }
 
     Object.assign(instance, parsed.data);
