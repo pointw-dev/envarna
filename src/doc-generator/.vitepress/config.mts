@@ -46,7 +46,7 @@ export default defineConfig({
   },
 
   appearance: 'dark',
-  base: '/envarna/',   // calculatedBasePath,
+  base: calculatedBasePath,
   head: [
     ['link', { rel: 'icon', href: `/${calculatedBasePath}/favicon.ico` }],
 
