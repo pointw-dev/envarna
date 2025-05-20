@@ -46,7 +46,7 @@ export default defineConfig({
   },
 
   appearance: 'dark',
-  base: 'https://pointw-dev.github.io/envarna/', //calculatedBasePath,
+  base: '/envarna/',   // calculatedBasePath,
   head: [
     ['link', { rel: 'icon', href: `/${calculatedBasePath}/favicon.ico` }],
 
