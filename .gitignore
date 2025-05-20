@@ -10,8 +10,11 @@ lerna-debug.log*
 .pnpm-debug.log*
 
 
-**/*.js
-**/*.d.ts
+src/**/*.js
+src/**/*.d.ts
+# Allow .js files elsewhere
+!*.js
+!docs/**/*.js
 
 # Diagnostic reports (https://nodejs.org/api/report.html)
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json

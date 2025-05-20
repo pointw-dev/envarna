@@ -22,7 +22,7 @@ hero:
 features:
   - title: Type Safety
     icon: 🧷
-    details: With envarna, every setting value is strongly typed.  No more <span class="code">parseInt(process.env.FOO)</span>. Instead, you define settings using decorators and envarna handles parsing and coercion automatically.<br/><br/><br/><br/><br/>
+    details: With envarna, every setting value is strongly typed.  No more <span class="code">parseInt(process.env.FOO)</span> Instead, you define settings with decorators and envarna handles parsing and coercion automatically.<br/><br/><br/><br/><br/>
     linkText: Learn more
     link: /introduction/quickstart
   - title: Validation and Defaults
