@@ -2,15 +2,14 @@ import { defineConfig, withBase } from 'vitepress'
 import { fileURLToPath, URL } from 'node:url'
 const pkg = require('../../package.json')
 
-
-const hostname = 'https://pointw-dev.github.io/envarna'
+const hostname = 'https://pointw-dev.github.io'
 const basePath = 'envarna'
 const seoLogo = 'https://pointw-dev.github.io/envarna/img/envarna-card.png'
 const title = 'envarna'
 const tagline = 'Settings managed'
 
 const calculatedBasePath = (basePath? `/${basePath}/` : '/')
-const siteUrl = hostname + (basePath? `/${basePath}/` : '')
+const siteUrl = hostname + calculatedBasePath
 
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
@@ -46,9 +45,10 @@ export default defineConfig({
     }
   },
 
+  appearance: 'dark',
   base: calculatedBasePath,
   head: [
-    ['link', { rel: 'icon', href: `${calculatedBasePath}favicon.ico` }],
+    ['link', { rel: 'icon', href: `/${calculatedBasePath}/favicon.ico` }],
 
     // test with https://www.opengraph.xyz/url/
     ['meta', {property: 'og:image', content: seoLogo}],
@@ -62,6 +62,7 @@ export default defineConfig({
     ['meta', {property: "twitter:url", content: siteUrl}],
     ['meta', {name: "twitter:title", content: title}],
     ['meta', {name: "twitter:description", content: tagline}]
+
   ],
   srcDir: 'src',
   vite: {
