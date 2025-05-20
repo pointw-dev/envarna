@@ -14,7 +14,7 @@ Settings are grouped into classes, each representing a coherent domain of config
 
 ```ts
 // settings/app.ts
-import { BaseSettings, settings } from "envarna";
+import { BaseSettings, settings } from 'envarna';
 
 export class AppSettings extends BaseSettings {
   @settings.string()
@@ -27,7 +27,7 @@ export class AppSettings extends BaseSettings {
 
 ```ts
 // settings/page.ts
-import { BaseSettings, settings } from "envarna";
+import { BaseSettings, settings } from 'envarna';
 
 export class OtherSettings extends BaseSettings {
   @settings.number()
@@ -42,9 +42,9 @@ Use `createSettingsProxy()` to define a centralized `settings` object. This patt
 
 ```ts
 // settings/index.ts
-import { createSettingsProxy } from "envarna";
-import { AppSettings } from "./app";
-import { PageSettings } from "./page";
+import { createSettingsProxy } from 'envarna';
+import { AppSettings } from './app';
+import { PageSettings } from './page';
 
 export const settings = createSettingsProxy({
   app: () => AppSettings.load(),
@@ -56,7 +56,7 @@ export const settings = createSettingsProxy({
 
 ```ts
 // main.ts
-import { settings } from "./settings";
+import { settings } from './settings';
 
 if (settings.app.debug) {
   console.debug(`Retry count ${settings.other.numRetries}`);
@@ -72,7 +72,7 @@ Envarna loads the settings with values from environment variables. The names of 
 
 By default, envarna loads variables from first from the process environment (`process.env`) and secondly (if it exists) from `.env` file using `dotenv`.
 
-```env
+```plaintext
 APP_NAME=MyApp
 APP_DEBUG=true
 OTHER_NUM_RETRIES=50
@@ -85,7 +85,7 @@ You can expand your schema using Zod-compatible validators with a `v` extension.
 
 ```ts
 // settings/service.ts
-import { BaseSettings, settings, v } from "envarna";
+import { BaseSettings, settings, v } from 'envarna';
 
 export class ServiceSettings extends BaseSettings {
   @settings(v.string().length(10))
@@ -97,7 +97,7 @@ export class ServiceSettings extends BaseSettings {
 }
 ```
 
-```env
+```plaintext
 SERVICE_API_KEY=abcdefghij
 AMCE_API_URL=https://api.example.com
 ```

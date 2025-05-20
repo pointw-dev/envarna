@@ -37,7 +37,7 @@ function toMarkdownTable(section: string, group: EnvVarGroup): string {
         ([k, v]) => !k.startsWith('_') && isEnvVarSpec(v)
     ) as [string, EnvVarSpec][];
 
-    const header = `| Envar |${hasAlias ? ' Alias |' : ''} Code | Type | Default |
+    const header = `| Env Var |${hasAlias ? ' Alias |' : ''} Usual Path | Type | Default |
 | -------------- |${hasAlias ? ' ------ |' : ''} ----------------------- | ------------------ | --------- |`;
 
     const rows = entries.map(([envar, entry]) => {

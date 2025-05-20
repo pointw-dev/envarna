@@ -96,8 +96,18 @@ function getSidebar() {
       {
         text: 'Introduction',
         items: [
-          { text: 'What is pointw?', link: '/introduction/what-is' },
+          { text: 'What is envarna?', link: '/introduction/what-is' },
           { text: 'Getting started', link: '/introduction/quickstart' }
+        ]
+      },
+      {
+        text: 'How-to',
+        items: [
+          { text: 'Settings classes', link: '/how-to/settings-classes' },
+          { text: 'The <code>settings</code> object',  link: '/how-to/settings-object' },
+          { text: 'Decorators',  link: '/how-to/decorators' },
+          { text: 'Command lines', link: '/how-to/command-line' },
+          { text: 'Testing',  link: '/how-to/testing' }
         ]
       }
     ]

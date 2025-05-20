@@ -4,14 +4,11 @@ import {
   Project,
   Expression,
   ts,
-  CallExpression,
-  PropertyAccessExpression,
 } from 'ts-morph';
 
 import { getFieldSchemas, isSecret, getAliases } from '../lib/decorators.js';
 import { BaseSettings } from '../lib';
-import { ZodTypeAny } from 'zod';
-import { PROJECT_ROOT, SETTINGS_DIR } from '../lib/paths.js';
+import { PROJECT_ROOT } from '../lib/paths.js';
 
 export type EnvSpec = Record<
     string,
@@ -57,12 +54,12 @@ function findBaseCallName(expr: Expression): string | null {
   return null;
 }
 
-export async function extractEnvSpec(settingsDir = SETTINGS_DIR): Promise<EnvSpec> {
+export async function extractEnvSpec(scanDir = PROJECT_ROOT): Promise<EnvSpec> {
   const project = new Project({
     tsConfigFilePath: path.resolve(PROJECT_ROOT, 'tsconfig.json'),
   });
 
-  project.addSourceFilesAtPaths(path.join(settingsDir, '**/*.ts'));
+  project.addSourceFilesAtPaths(path.join(scanDir, '**/*.ts'));
 
   const result: EnvSpec = {};
 

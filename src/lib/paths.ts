@@ -13,5 +13,4 @@ function findProjectRoot(startDir: string): string {
 }
 
 export const PROJECT_ROOT = findProjectRoot(process.cwd());
-export const SETTINGS_DIR = path.resolve(PROJECT_ROOT, 'src/settings');
 export const DOTENV_PATH = path.resolve(PROJECT_ROOT, '.env');

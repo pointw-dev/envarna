@@ -12,7 +12,7 @@ export async function printSettings(): Promise<void> {
         const hasAlias = '_hasAlias' in group;
 
         const rows: string[][] = [];
-        const header = ['Envar', ...(hasAlias ? ['Alias'] : []), 'Code', 'Type', 'Default'];
+        const header = ['Env Var', ...(hasAlias ? ['Alias'] : []), 'Usual Path', 'Type', 'Default'];
         rows.push(header);
         rows.push(header.map(h => '-'.repeat(h.length)));
 

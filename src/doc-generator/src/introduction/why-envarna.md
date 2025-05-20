@@ -1,4 +1,6 @@
-# Why not just use `process.env`? Isn’t it good enough?
+# Why envarna? 
+
+> Why not just use `process.env`? Isn’t it good enough?
 
 `dotenv` and `process.env` are time-tested, widely used tools.  Envarna builds on them. For many projects, they’re all you need. But as configuration grows more complex, envarna steps in to provide structure, validation, and safety on top of that foundation.
 
