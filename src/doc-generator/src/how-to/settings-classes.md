@@ -1,7 +1,5 @@
 # Settings classes
 
-<centered-image src="/img/work-in-progress.png" />
-
 > The following assumes that you create all settings classes in `src/settings`. Adjust as required if you put yours somewhere else.
 
 The settings class is where it all begins.  Extend envarna's `BaseSettings` and define each setting your application needs as a field of that class.  When loaded
