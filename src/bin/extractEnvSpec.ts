@@ -59,7 +59,12 @@ export async function extractEnvSpec(scanDir = PROJECT_ROOT): Promise<EnvSpec> {
     tsConfigFilePath: path.resolve(PROJECT_ROOT, 'tsconfig.json'),
   });
 
-  project.addSourceFilesAtPaths(path.join(scanDir, '**/*.ts'));
+  project.addSourceFilesAtPaths([
+    path.join(scanDir, '**/*.ts'),
+    `!${path.join(scanDir, 'node_modules')}/**/*`,
+    `!${path.join(scanDir, 'dist')}/**/*`,
+    `!${path.join(scanDir, 'coverage')}/**/*`, // optional
+  ]);
 
   const result: EnvSpec = {};
 

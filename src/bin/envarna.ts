@@ -19,7 +19,7 @@ import { writeRawEnvSpec } from "./generateRaw.js";
 // Locate package.json relative to *compiled* file (e.g., dist/bin/envarna.js)
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
-const pkgPath = path.resolve(__dirname, '..', '..', 'package.json')
+const pkgPath = path.resolve(__dirname, '..', '..', '..', 'package.json')
 const pkg = JSON.parse(readFileSync(pkgPath, 'utf-8'))
 
 
