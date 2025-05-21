@@ -48,7 +48,7 @@ export default defineConfig({
   appearance: 'dark',
   base: calculatedBasePath,
   head: [
-    ['link', { rel: 'icon', href: `/${calculatedBasePath}/favicon.ico` }],
+    ['link', { rel: 'icon', href: `${calculatedBasePath}favicon.ico` }],
 
     // test with https://www.opengraph.xyz/url/
     ['meta', {property: 'og:image', content: seoLogo}],
@@ -108,7 +108,8 @@ function getSidebar() {
           { text: 'The <code>settings</code> object',  link: '/how-to/settings-object' },
           { text: 'Decorators',  link: '/how-to/decorators' },
           { text: 'Command lines', link: '/how-to/command-line' },
-          { text: 'Testing',  link: '/how-to/testing' }
+          { text: 'Testing',  link: '/how-to/testing' },
+          { text: 'Module Format Compatibility',  link: '/how-to/module-compatibility' },
         ]
       }
     ]

@@ -16,6 +16,9 @@
 
 > You can still use raw Zod if needed, just remember to be aware of coercion:
 
+See the sections (string formats, numbers, etc.) under [Zod's Defining schemas](https://zod.dev/api?id=strings) for more details on building validation chains for each type.
+
+
 ## @secret
 * marks a field as a secret
 * adds this note to generated formats (e.g. `npx envarna list`)

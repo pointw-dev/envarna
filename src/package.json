@@ -1,6 +1,6 @@
 {
   "name": "envarna",
-  "version": "0.3.15",
+  "version": "0.4.1",
   "description": "Settings managed. A powerful library for managing configuration details.",
   "repository": {
     "type": "git",
@@ -12,16 +12,25 @@
     "dotenv",
     "zod"
   ],
-  "main": "dist/index.js",
   "type": "module",
-  "types": "dist/index.d.ts",
-  "bin": {
-    "envarna": "./dist/bin/envarna.js"
+  "exports": {
+    ".": {
+      "import": "./dist/esm/index.js",
+      "require": "./dist/cjs/index.js",
+      "types": "./dist/esm/index.d.ts"
+    }
   },
+  "bin": {
+    "envarna": "./dist/esm/bin/envarna.js"
+  },
+  "types": "./dist/esm/index.d.ts",
   "scripts": {
     "test": "NODE_NO_WARNINGS=1 NODE_OPTIONS='--loader ts-node/esm' cucumber-js",
-    "build": "tsc",
-    "prepare": "npm run build"
+    "build:cjs": "tsc -p tsconfig.cjs.json",
+    "build:esm": "tsc -p tsconfig.esm.json",
+    "build": "npm run build:cjs && npm run build:esm",
+    "prepare": "npm run build",
+    "prepack": "npm run prepare"
   },
   "dependencies": {
     "change-case": "^4.0.0",
@@ -46,5 +55,8 @@
     "dist",
     "README.md",
     "LICENSE"
-  ]
+  ],
+  "engines": {
+    "node": ">=18"
+  }
 }

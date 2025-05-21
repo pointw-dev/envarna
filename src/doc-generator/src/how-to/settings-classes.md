@@ -99,3 +99,44 @@ uppercase-segment = uppercase-letter , { lowercase-letter } ;
 uppercase(s)   = convert all letters of s to uppercase ;
 camel-to-snake(s) = replace each uppercase letter in s with "_" + lowercase(letter) ;
 ```
+
+## Advanced validation
+In addition to field by field validations with decorators, you can also override `validate()` to perform validations across all fields.  For example, in the following class `username` and `password` are each optional.  To enforce the rule that if one is set both must be set:
+
+```typescript{23-32}
+import { BaseSettings, setting, secret, v, alias } from "envarna";
+
+export class SmtpSettings extends BaseSettings {
+  @setting.string()
+  host: string = 'localhost'
+
+  @setting.number()
+  port: number = 25
+
+  @setting.string()
+  from: string = 'noreply@example.org'
+
+  @setting.boolean()
+  useTls: boolean = false
+
+  @setting(v.string().optional())
+  username?: string;
+
+  @setting(v.string().optional())
+  @secret()
+  password?: string;
+
+  override validate(): void {
+    const hasUsername = this.username !== undefined;
+    const hasPassword = this.password !== undefined;
+
+    if (hasUsername !== hasPassword) {
+      throw new Error(
+        "Both username and password must be set together or left undefined."
+      );
+    }
+  }  
+}
+```
+
+This is also a way to enforce mutual exclusivity amongst two or more fields.
