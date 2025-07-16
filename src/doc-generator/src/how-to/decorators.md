@@ -24,13 +24,17 @@ See the sections (string formats, numbers, etc.) under [Zod's Defining schemas](
 * adds this note to generated formats (e.g. `npx envarna list`)
 * prevents typical log dumps from revealing the secret value (replaced with `***`)
 
-
 ## @alias
 * allows you to set an environment variable name to be used to populate this field
-
 
 ## @pushToEnv
 * if the matching environment variable for this field is missing, the default supplied to this field is exported to that envar.
 * this is handy for setting up a dev version that pushes environment variable values for use by external services that require them
 * handy when needed, but use with caution!
+
+## @devOnly
+* marks a field as intended only for development use
+* add this note to generated formats (e.g. `npx envarna list`)
+* does not alter any functionality - documentation/scripting purposes only
+
 
