@@ -1,6 +1,6 @@
 {
   "name": "envarna",
-  "version": "0.4.3",
+  "version": "0.5.2",
   "description": "Settings managed. A powerful library for managing configuration details.",
   "repository": {
     "type": "git",
@@ -12,25 +12,20 @@
     "dotenv",
     "zod"
   ],
-  "type": "module",
+  "type": "commonjs",
   "exports": {
-    ".": {
-      "import": "./dist/esm/index.js",
-      "require": "./dist/cjs/index.js",
-      "types": "./dist/esm/index.d.ts"
-    }
+    ".": "./dist/index.js"
   },
   "bin": {
-    "envarna": "./dist/esm/bin/envarna.js"
+    "envarna": "./dist/bin/envarna.js"
   },
-  "types": "./dist/esm/index.d.ts",
+  "types": "./dist/index.d.ts",
   "scripts": {
-    "test": "NODE_NO_WARNINGS=1 NODE_OPTIONS='--loader ts-node/esm' cucumber-js",
-    "build:cjs": "tsc -p tsconfig.cjs.json",
-    "build:esm": "tsc -p tsconfig.esm.json",
-    "build": "npm run build:cjs && npm run build:esm",
-    "prepare": "npm run build",
-    "prepack": "npm run prepare"
+    "clean": "rimraf dist",
+    "test": "cucumber-js",
+    "test:coverage": "c8 --reporter=lcov --reporter=text npm run test",
+    "build": "npm run clean && tsc -p tsconfig.json",
+    "prepack": "npm run build"
   },
   "dependencies": {
     "change-case": "^4.0.0",
@@ -47,7 +42,9 @@
     "@types/dotenv": "^6.1.1",
     "@types/node": "^22.15.2",
     "@types/yargs": "^17.0.33",
+    "c8": "^10.1.3",
     "chai": "^5.2.0",
+    "rimraf": "^6.0.1",
     "ts-node": "^10.9.2",
     "typescript": "^5.0.0"
   },
@@ -55,8 +52,5 @@
     "dist",
     "README.md",
     "LICENSE"
-  ],
-  "engines": {
-    "node": ">=18"
-  }
+  ]
 }

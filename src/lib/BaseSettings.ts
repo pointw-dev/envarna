@@ -1,9 +1,9 @@
 import { z, ZodObject, ZodRawShape, ZodTypeAny, ZodError } from "zod";
 import 'reflect-metadata';
 import dotenv from "dotenv";
-import { extractPrefixedEnv } from "./utils.js";
-import {getAliases, getFieldSchemas, isSecret} from "./decorators.js";
-import { DOTENV_PATH } from "./paths.js";
+import { extractPrefixedEnv } from "./utils";
+import { getAliases, getFieldSchemas, isSecret } from "./decorators";
+import { DOTENV_PATH } from "./paths";
 
 export class BaseSettings {
   /** Holds test override values, if any. */

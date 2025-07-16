@@ -1,3 +1,3 @@
-export { BaseSettings } from './BaseSettings.js'
-export { setting, secret, pushToEnv, v, alias } from './decorators.js'
-export { createSettingsProxy, withMemo } from './utils.js'
+export { BaseSettings } from './BaseSettings'
+export { setting, secret, pushToEnv, v, alias } from './decorators'
+export { createSettingsProxy, withMemo } from './utils'

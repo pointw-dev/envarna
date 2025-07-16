@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { Given, When, Then, Before, After } from '@cucumber/cucumber'
 import { EnvFixture } from './env-fixture.js'
-import { BaseSettings, setting } from '../lib/index.js';
+import { BaseSettings, setting } from '../src';
 
 
 type SettingsClass = typeof BaseSettings;
@@ -25,8 +25,8 @@ Given('the environment variable {string} is set to {string}', function (key: str
     env.setEnvVariable(key, value);
 });
 
-Given('an .env file that contains:', function (docString: string) {
-    env.createDotenvFile(docString);
+Given('an .env file that contains:', function (fileString: string) {
+    env.createDotenvFile(fileString);
     env.loadDotenv();
 });
 
@@ -64,4 +64,3 @@ Then('the setting {string} value is {string}', function (settingKey: string, exp
     const actual = this.settings[settingKey];
     expect(actual).to.equal(expected);
 });
-

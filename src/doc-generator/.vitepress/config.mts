@@ -1,6 +1,6 @@
 import { defineConfig, withBase } from 'vitepress'
 import { fileURLToPath, URL } from 'node:url'
-const pkg = require('../../package.json')
+const pkg = require('../../../package.json')
 
 const hostname = 'https://pointw-dev.github.io'
 const basePath = 'envarna'

@@ -49,7 +49,7 @@ export async function generateJson(root: string | null = null, flat = false, use
         value = `{${meta.type}}`;
       }
 
-      const outputKey = useCodeAsKey ? meta.originalName : meta.alias ?? envar;
+      const outputKey = useCodeAsKey ? meta.fieldName : meta.alias ?? envar;
 
       if (flat && root) {
         output[root][outputKey] = value;

@@ -18,9 +18,9 @@ export async function printSettings(): Promise<void> {
 
         for (const [envar, entry] of entries) {
             if (typeof entry === 'object' && entry !== null) {
-                const code = `settings.${section.toLowerCase()}.${entry.originalName}`;
+                const code = `settings.${section.toLowerCase()}.${entry.fieldName}`;
                 const row = [
-                    envar + (entry.secret ? ' (secret)' : ''),
+                    (entry.devOnly ? '[dev only] ' : '') + envar + (entry.secret ? ' (secret)' : ''),
                     ...(hasAlias ? [entry.alias ?? ''] : []),
                     code,
                     entry.type,

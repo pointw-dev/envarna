@@ -1,6 +1,6 @@
 import { z, ZodTypeAny } from "zod";
 import 'reflect-metadata';
-import { toEnvVar } from "./utils.js";
+import { toEnvVar } from "./utils";
 
 const aliases = new WeakMap<Function, Record<string, string>>();
 const fieldMetadata = new WeakMap<Function, Record<string, ZodTypeAny>>();
@@ -37,10 +37,17 @@ export function pushToEnv(): PropertyDecorator {
   };
 }
 
-// Marks a field as secret (for doc generation)
+// Marks a field as secret (for doc generation/scripting)
 export function secret(): PropertyDecorator {
   return (target: any, propertyKey: string | symbol) => {
     Reflect.defineMetadata('envarna:secret', true, target, propertyKey.toString());
+  };
+}
+
+// Marks a field as dev only (for doc generation/scripting)
+export function devOnly(): PropertyDecorator {
+  return (target: any, propertyKey: string | symbol) => {
+    Reflect.defineMetadata('envarna:devOnly', true, target, propertyKey.toString());
   };
 }
 
@@ -70,6 +77,10 @@ export function alias(name: string): PropertyDecorator {
 
 export function isSecret(target: any, propertyKey: string): boolean {
   return Reflect.getMetadata('envarna:secret', target, propertyKey.toString()) === true;
+}
+
+export function isDevOnly(target: any, propertyKey: string): boolean {
+  return Reflect.getMetadata('envarna:devOnly', target, propertyKey.toString()) === true;
 }
 
 export function getAliases(klass: Function): Record<string, string> {

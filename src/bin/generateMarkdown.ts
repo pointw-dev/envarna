@@ -7,8 +7,9 @@ const OUTPUT_FILE = path.join(PROJECT_ROOT, 'SETTINGS.md');
 
 type EnvVarSpec = {
     default: string | null;
-    originalName: string;
+    fieldName: string;
     secret: boolean;
+    devOnly: boolean;
     type: string;
     description?: string | null;
     pattern?: string | null;
@@ -24,8 +25,8 @@ function isEnvVarSpec(entry: unknown): entry is EnvVarSpec {
     return (
         typeof entry === 'object' &&
         entry !== null &&
-        'originalName' in entry &&
-        typeof (entry as any).originalName === 'string'
+        'fieldName' in entry &&
+        typeof (entry as any).fieldName === 'string'
     );
 }
 
@@ -41,9 +42,9 @@ function toMarkdownTable(section: string, group: EnvVarGroup): string {
 | -------------- |${hasAlias ? ' ------ |' : ''} ----------------------- | ------------------ | --------- |`;
 
     const rows = entries.map(([envar, entry]) => {
-        const code = `settings.${section.toLowerCase()}.${entry.originalName}`;
+        const code = `settings.${section.toLowerCase()}.${entry.fieldName}`;
         const aliasCell = hasAlias ? ` ${entry.alias ?? ''} |` : '';
-        return `| ${envar + (entry.secret ? ' (secret)' : '')} |${aliasCell} ${code} | ${entry.type} | ${entry.default ?? ''} |`;
+        return `| ${(entry.devOnly ? '[dev only] ' : '') + envar + (entry.secret ? ' (secret)' : '')} |${aliasCell} ${code} | ${entry.type} | ${entry.default ?? ''} |`;
     });
 
     const hasSecrets = entries.some(([, entry]) => entry.secret);

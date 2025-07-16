@@ -6,7 +6,7 @@ import {
   ts,
 } from 'ts-morph';
 
-import { getFieldSchemas, isSecret, getAliases } from '../lib/decorators.js';
+import { getFieldSchemas } from '../lib/decorators.js';
 import { BaseSettings } from '../lib';
 import { PROJECT_ROOT } from '../lib/paths.js';
 
@@ -19,8 +19,9 @@ export type EnvSpec = Record<
     string,
     {
       default: string | null;
-      originalName: string;
+      fieldName: string;
       secret: boolean;
+      devOnly: boolean;
       type: string;
       description: string | null;
       pattern: string | null;
@@ -96,7 +97,7 @@ export async function extractEnvSpec(scanDir = PROJECT_ROOT): Promise<EnvSpec> {
         instance = new Ctor();
       } catch (err: any) {
         if (err?.code !== 'ERR_UNKNOWN_FILE_EXTENSION') {
-          console.warn(`[envarna] Failed to import ${tsPath}:`, err);
+          // console.warn(`[envarna] Failed to import ${tsPath}:`, err);
         }
         instance = Object.create(null);
       }
@@ -116,6 +117,7 @@ export async function extractEnvSpec(scanDir = PROJECT_ROOT): Promise<EnvSpec> {
         const envar = toEnvVar(className, name);
         const decorators = prop.getDecorators();
         const isSecret = decorators.some(d => d.getName() === 'secret');
+        const isDevOnly = decorators.some(d => d.getName() === 'devOnly');
         const fieldComment = prop.getJsDocs()[0]?.getComment();
         const description = fieldComment != null ? String(fieldComment) : null;
 
@@ -222,8 +224,9 @@ export async function extractEnvSpec(scanDir = PROJECT_ROOT): Promise<EnvSpec> {
 
         group[envar] = {
           default: defaultValue,
-          originalName: name,
+          fieldName: name,
           secret: isSecret,
+          devOnly: isDevOnly,
           type,
           description,
           pattern,

@@ -12,7 +12,7 @@ export async function generateYaml(root: string = 'settings', flat = false, useC
       if (envar.startsWith('_')) continue;
       if (typeof meta !== 'object' || meta == null || !('default' in meta)) continue;
 
-      const yamlKey = useCodeAsKey ? meta.originalName : meta.alias ?? envar;
+      const yamlKey = useCodeAsKey ? meta.fieldName : meta.alias ?? envar;
       let value: any;
 
       if (meta.default != null) {

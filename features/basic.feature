@@ -1,4 +1,4 @@
-Feature: Members of BaseSettings objects are populated in various ways
+Feature: The settings defined in a subclass of BaseSettings are populated in various ways
 
   Scenario: settings value loaded from environment
     Given the environment variable "API_HOST" is set to "from-process"
