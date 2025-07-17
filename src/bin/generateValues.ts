@@ -17,7 +17,8 @@ export async function writeValuesYaml(): Promise<void> {
     for (const [, entry] of entries) {
       if (typeof entry === 'object' && entry !== null) {
         const key = camelCase(entry.fieldName);
-        const value = entry.default ?? `{${entry.type}}`;
+        const typeLabel = `${entry.type}${entry.devOnly ? ' [devOnly]' : ''}`;
+        const value = entry.default ?? `{${typeLabel}}`;
         lines.push(`  ${key}: ${value}`);
       }
     }

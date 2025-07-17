@@ -11,7 +11,6 @@ export async function generateYaml(root: string = 'settings', flat = false, useC
     for (const [envar, meta] of Object.entries(vars)) {
       if (envar.startsWith('_')) continue;
       if (typeof meta !== 'object' || meta == null || !('default' in meta)) continue;
-
       const yamlKey = useCodeAsKey ? meta.fieldName : meta.alias ?? envar;
       let value: any;
 
@@ -50,7 +49,8 @@ export async function generateYaml(root: string = 'settings', flat = false, useC
             value = meta.default;
         }
       } else {
-        value = `-{-${meta.type}-}-`;
+        const typeLabel = `${meta.type}${meta.devOnly ? ' [devOnly]' : ''}`;
+        value = `-{-${typeLabel}-}-`;
       }
 
       if (flat) {

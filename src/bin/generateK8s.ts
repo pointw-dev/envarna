@@ -9,7 +9,6 @@ export async function generateK8s(): Promise<string> {
     for (const [key, meta] of Object.entries(vars)) {
       if (key.startsWith('_')) continue;
       if (typeof meta !== 'object' || meta == null || !('default' in meta)) continue;
-
       const name = meta.alias ?? key;
       let rawValue: string;
 
@@ -43,7 +42,8 @@ export async function generateK8s(): Promise<string> {
             rawValue = meta.default; // Let YAML quote as needed
         }
       } else {
-        rawValue = `__PLACEHOLDER__{${meta.type}}__`; // marker for post-processing
+        const typeLabel = `${meta.type}${meta.devOnly ? ' [devOnly]' : ''}`;
+        rawValue = `__PLACEHOLDER__{${typeLabel}}__`; // marker for post-processing
       }
 
       envList.push({
