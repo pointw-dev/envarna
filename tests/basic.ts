@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 import { Given, When, Then, Before, After } from '@cucumber/cucumber'
-import { EnvFixture } from './env-fixture.js'
+import { EnvFixture } from './env-fixture'
 import { BaseSettings, setting } from '../src';
 
 
