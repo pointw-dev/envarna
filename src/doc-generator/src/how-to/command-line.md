@@ -23,9 +23,9 @@ Commands:
                        sses used to power the other formats
 
 Options:
-  --version  Show version number                                       [boolean]
-  --skip-dev  Exclude fields marked @devOnly                            [boolean]
-  --help     Show help                                                 [boolean]
+  --version   Show version number                                       [boolean]
+  --skip-dev  Exclude fields marked @devOnly (default: false)           [boolean]
+  --help      Show help                                                 [boolean]
 ```
 
 ## list
@@ -49,14 +49,14 @@ Display kubernetes style env var structure
 ## json
 Display JSON settings structure
 [root]
---flat
---code
+--flat (default: false)
+--code (default: false)
 
 ## yaml
 Display YAML settings structure
 [root]
---flat
---code
+--flat (default: false)
+--code (default: false)
 
 ## raw
 Raw output of the structure used to create the above
