@@ -46,7 +46,7 @@ export async function generateJson(root: string | null = null, flat = false, use
             value = meta.default;
         }
       } else {
-        const typeLabel = formatType(meta.type, meta.devOnly);
+        const typeLabel = formatType(meta);
         value = `{${typeLabel}}`;
       }
 

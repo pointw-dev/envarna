@@ -43,7 +43,7 @@ export async function generateK8s(): Promise<string> {
             rawValue = meta.default; // Let YAML quote as needed
         }
       } else {
-        const typeLabel = formatType(meta.type, meta.devOnly);
+        const typeLabel = formatType(meta);
         rawValue = `__PLACEHOLDER__{${typeLabel}}__`; // marker for post-processing
       }
 

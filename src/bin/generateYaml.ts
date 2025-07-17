@@ -50,7 +50,7 @@ export async function generateYaml(root: string = 'settings', flat = false, useC
             value = meta.default;
         }
       } else {
-        const typeLabel = formatType(meta.type, meta.devOnly);
+        const typeLabel = formatType(meta);
         value = `-{-${typeLabel}-}-`;
       }
 

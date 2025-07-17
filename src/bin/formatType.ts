@@ -1,13 +1,15 @@
-export function formatType(type: string, devOnly: boolean): string {
+export interface TypeInfo {
+  type: string;
+  devOnly: boolean;
+  optional?: boolean;
+  pattern?: string | null;
+}
+
+export function formatType(info: TypeInfo): string {
   const annotations: string[] = [];
-  let clean = type.replace(/\s*\[(pattern|optional)\]/g, (_, a) => {
-    annotations.push(a);
-    return '';
-  });
-  clean = clean.replace(/\s+/g, ' ').trim();
-  if (devOnly) annotations.push('devOnly');
-  if (annotations.length > 0) {
-    return `${clean} [${annotations.join(', ')}]`;
-  }
-  return clean;
+  const clean = info.type.replace(/\s+/g, ' ').trim();
+  if (info.optional) annotations.push('optional');
+  if (info.pattern) annotations.push('pattern');
+  if (info.devOnly) annotations.push('devOnly');
+  return annotations.length > 0 ? `${clean} [${annotations.join(', ')}]` : clean;
 }

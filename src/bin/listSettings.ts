@@ -24,7 +24,7 @@ export async function printSettings(): Promise<void> {
                     envar + (entry.secret ? ' (secret)' : ''),
                     ...(hasAlias ? [entry.alias ?? ''] : []),
                     code,
-                    formatType(entry.type, entry.devOnly),
+                    formatType(entry),
                     entry.default ?? ''
                 ];
                 rows.push(row);
