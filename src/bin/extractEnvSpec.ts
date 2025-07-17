@@ -56,7 +56,10 @@ function findBaseCallName(expr: Expression): string | null {
   return null;
 }
 
-export async function extractEnvSpec(scanDir = PROJECT_ROOT): Promise<EnvSpec> {
+export async function extractEnvSpec(
+  scanDir: string = PROJECT_ROOT,
+  skipDev: boolean = false
+): Promise<EnvSpec> {
   const project = new Project({
     tsConfigFilePath: path.resolve(PROJECT_ROOT, 'tsconfig.json'),
   });
@@ -119,6 +122,7 @@ export async function extractEnvSpec(scanDir = PROJECT_ROOT): Promise<EnvSpec> {
         const decorators = prop.getDecorators();
         const isSecret = decorators.some(d => d.getName() === 'secret');
         const isDevOnly = decorators.some(d => d.getName() === 'devOnly');
+        if (skipDev && isDevOnly) continue;
         const fieldComment = prop.getJsDocs()[0]?.getComment();
         const description = fieldComment != null ? String(fieldComment) : null;
 

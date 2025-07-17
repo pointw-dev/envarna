@@ -1,8 +1,13 @@
 import { extractEnvSpec } from './extractEnvSpec.js';
 import { formatType } from './formatType.js';
 
-export async function generateJson(root: string | null = null, flat = false, useCodeAsKey = false): Promise<string> {
-  const spec = await extractEnvSpec();
+export async function generateJson(
+  root: string | null = null,
+  flat = false,
+  useCodeAsKey = false,
+  skipDev = false
+): Promise<string> {
+  const spec = await extractEnvSpec(undefined, skipDev);
   const output: any = root ? { [root]: {} } : {};
 
   for (const [group, vars] of Object.entries(spec)) {

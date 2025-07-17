@@ -7,8 +7,8 @@ import { PROJECT_ROOT } from '../lib/paths.js';
 
 const OUTPUT_FILE = path.join(PROJECT_ROOT, 'values.yaml');
 
-export async function writeValuesYaml(): Promise<void> {
-  const spec = await extractEnvSpec();
+export async function writeValuesYaml(skipDev = false): Promise<void> {
+  const spec = await extractEnvSpec(undefined, skipDev);
   const lines: string[] = [];
 
   for (const [section, group] of Object.entries(spec)) {
