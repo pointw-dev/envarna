@@ -1,4 +1,5 @@
 import { extractEnvSpec } from './extractEnvSpec.js';
+import { formatType } from './formatType.js';
 
 function padRight(value: string, width: number): string {
     return value + ' '.repeat(width - value.length);
@@ -23,7 +24,7 @@ export async function printSettings(): Promise<void> {
                     envar + (entry.secret ? ' (secret)' : ''),
                     ...(hasAlias ? [entry.alias ?? ''] : []),
                     code,
-                    entry.type + (entry.devOnly ? ' [devOnly]' : ''),
+                    formatType(entry.type, entry.devOnly),
                     entry.default ?? ''
                 ];
                 rows.push(row);

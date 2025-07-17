@@ -1,4 +1,5 @@
 import { extractEnvSpec } from './extractEnvSpec.js';
+import { formatType } from './formatType.js';
 
 export async function writeComposeEnvFile(): Promise<string> {
     const spec = await extractEnvSpec();
@@ -9,7 +10,7 @@ export async function writeComposeEnvFile(): Promise<string> {
             if (envar.startsWith('_')) continue;
             if (typeof entry !== 'object' || entry === null || !('default' in entry)) continue;
             const name = entry.alias ?? envar;
-            const typeLabel = `${entry.type}${entry.devOnly ? ' [devOnly]' : ''}`;
+            const typeLabel = formatType(entry.type, entry.devOnly);
             const def = entry.default ?? `{${typeLabel}}`;
             lines.push(`  ${name}: ${def}`);
         }

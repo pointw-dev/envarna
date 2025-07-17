@@ -2,6 +2,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { camelCase } from 'change-case';
 import { extractEnvSpec } from './extractEnvSpec.js';
+import { formatType } from './formatType.js';
 import { PROJECT_ROOT } from '../lib/paths.js';
 
 const OUTPUT_FILE = path.join(PROJECT_ROOT, 'values.yaml');
@@ -17,7 +18,7 @@ export async function writeValuesYaml(): Promise<void> {
     for (const [, entry] of entries) {
       if (typeof entry === 'object' && entry !== null) {
         const key = camelCase(entry.fieldName);
-        const typeLabel = `${entry.type}${entry.devOnly ? ' [devOnly]' : ''}`;
+        const typeLabel = formatType(entry.type, entry.devOnly);
         const value = entry.default ?? `{${typeLabel}}`;
         lines.push(`  ${key}: ${value}`);
       }

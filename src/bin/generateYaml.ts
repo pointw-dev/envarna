@@ -1,5 +1,6 @@
 // bin/generateYaml.ts
 import { extractEnvSpec } from './extractEnvSpec.js';
+import { formatType } from './formatType.js';
 import yaml from 'yaml';
 
 export async function generateYaml(root: string = 'settings', flat = false, useCodeAsKey = false): Promise<string> {
@@ -49,7 +50,7 @@ export async function generateYaml(root: string = 'settings', flat = false, useC
             value = meta.default;
         }
       } else {
-        const typeLabel = `${meta.type}${meta.devOnly ? ' [devOnly]' : ''}`;
+        const typeLabel = formatType(meta.type, meta.devOnly);
         value = `-{-${typeLabel}-}-`;
       }
 
