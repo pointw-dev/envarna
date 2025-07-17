@@ -44,7 +44,8 @@ function toMarkdownTable(section: string, group: EnvVarGroup): string {
     const rows = entries.map(([envar, entry]) => {
         const code = `settings.${section.toLowerCase()}.${entry.fieldName}`;
         const aliasCell = hasAlias ? ` ${entry.alias ?? ''} |` : '';
-        return `| ${(entry.devOnly ? '[dev only] ' : '') + envar + (entry.secret ? ' (secret)' : '')} |${aliasCell} ${code} | ${entry.type} | ${entry.default ?? ''} |`;
+        const typeCell = `${entry.type}${entry.devOnly ? ' [devOnly]' : ''}`;
+        return `| ${envar + (entry.secret ? ' (secret)' : '')} |${aliasCell} ${code} | ${typeCell} | ${entry.default ?? ''} |`;
     });
 
     const hasSecrets = entries.some(([, entry]) => entry.secret);

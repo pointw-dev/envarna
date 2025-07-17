@@ -20,10 +20,10 @@ export async function printSettings(): Promise<void> {
             if (typeof entry === 'object' && entry !== null) {
                 const code = `settings.${section.toLowerCase()}.${entry.fieldName}`;
                 const row = [
-                    (entry.devOnly ? '[dev only] ' : '') + envar + (entry.secret ? ' (secret)' : ''),
+                    envar + (entry.secret ? ' (secret)' : ''),
                     ...(hasAlias ? [entry.alias ?? ''] : []),
                     code,
-                    entry.type,
+                    entry.type + (entry.devOnly ? ' [devOnly]' : ''),
                     entry.default ?? ''
                 ];
                 rows.push(row);
