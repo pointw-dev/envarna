@@ -11,6 +11,7 @@ type EnvVarSpec = {
     fieldName: string;
     secret: boolean;
     devOnly: boolean;
+    optional: boolean;
     type: string;
     description?: string | null;
     pattern?: string | null;
@@ -45,7 +46,7 @@ function toMarkdownTable(section: string, group: EnvVarGroup): string {
     const rows = entries.map(([envar, entry]) => {
         const code = `settings.${section.toLowerCase()}.${entry.fieldName}`;
         const aliasCell = hasAlias ? ` ${entry.alias ?? ''} |` : '';
-        const typeCell = formatType(entry.type, entry.devOnly);
+        const typeCell = formatType(entry);
         return `| ${envar + (entry.secret ? ' (secret)' : '')} |${aliasCell} ${code} | ${typeCell} | ${entry.default ?? ''} |`;
     });
 

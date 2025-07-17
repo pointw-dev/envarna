@@ -22,6 +22,7 @@ export type EnvSpec = Record<
       fieldName: string;
       secret: boolean;
       devOnly: boolean;
+      optional: boolean;
       type: string;
       description: string | null;
       pattern: string | null;
@@ -124,6 +125,7 @@ export async function extractEnvSpec(scanDir = PROJECT_ROOT): Promise<EnvSpec> {
         let baseType = 'unknown';
         const chainModifiers: string[] = [];
         let fullPattern: string | null = null;
+        let isOptional = false;
 
         for (const decorator of decorators) {
           const callExpr = decorator.getCallExpression();
@@ -179,14 +181,15 @@ export async function extractEnvSpec(scanDir = PROJECT_ROOT): Promise<EnvSpec> {
           const lengthMatch = callText.match(/\.length\((\d+)\)/);
           if (lengthMatch) chainModifiers.push(`length=${lengthMatch[1]}`);
 
-          if (callText.includes('.regex(')) chainModifiers.push('[pattern]');
-          const regexMatch = callText.match(/\.regex\((\/.*?\/[gimsuy]*)\)/);
-          if (regexMatch) fullPattern = regexMatch[1];
+          if (callText.includes('.regex(')) {
+            const regexMatch = callText.match(/\.regex\((\/.*?\/[gimsuy]*)\)/);
+            if (regexMatch) fullPattern = regexMatch[1];
+          }
 
           if (callText.includes('.email()')) chainModifiers.push('email');
           if (callText.includes('.url()')) chainModifiers.push('url');
           if (callText.includes('.nonempty()')) chainModifiers.push('nonempty');
-          if (callText.includes('.optional()')) chainModifiers.push('[optional]');
+          if (callText.includes('.optional()')) isOptional = true;
           if (callText.includes('.nullable()')) chainModifiers.push('nullable');
 
           // ✅ If we detected enum(...) above, parse its actual values
@@ -227,6 +230,7 @@ export async function extractEnvSpec(scanDir = PROJECT_ROOT): Promise<EnvSpec> {
           fieldName: name,
           secret: isSecret,
           devOnly: isDevOnly,
+          optional: isOptional,
           type,
           description,
           pattern,

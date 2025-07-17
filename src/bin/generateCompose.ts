@@ -10,7 +10,7 @@ export async function writeComposeEnvFile(): Promise<string> {
             if (envar.startsWith('_')) continue;
             if (typeof entry !== 'object' || entry === null || !('default' in entry)) continue;
             const name = entry.alias ?? envar;
-            const typeLabel = formatType(entry.type, entry.devOnly);
+            const typeLabel = formatType(entry);
             const def = entry.default ?? `{${typeLabel}}`;
             lines.push(`  ${name}: ${def}`);
         }
