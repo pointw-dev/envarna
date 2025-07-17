@@ -1,6 +1,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import { extractEnvSpec } from './extractEnvSpec.js';
+import { formatType } from './formatType.js';
 import { PROJECT_ROOT } from '../lib/paths.js';
 
 const envFilename = '.env.template';
@@ -16,7 +17,7 @@ export async function writeEnvFile(): Promise<void> {
       if (typeof entry !== 'object' || entry === null || !('default' in entry)) continue;
 
       const name = entry.alias ?? envar;
-      const typeLabel = `${entry.type}${entry.devOnly ? ' [devOnly]' : ''}`;
+      const typeLabel = formatType(entry.type, entry.devOnly);
       const def = entry.default ?? `{${typeLabel}}`;
       lines.push(`${name}=${def}`);
     }

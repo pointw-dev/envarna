@@ -1,4 +1,5 @@
 import { extractEnvSpec } from './extractEnvSpec.js';
+import { formatType } from './formatType.js';
 
 export async function generateJson(root: string | null = null, flat = false, useCodeAsKey = false): Promise<string> {
   const spec = await extractEnvSpec();
@@ -45,7 +46,7 @@ export async function generateJson(root: string | null = null, flat = false, use
             value = meta.default;
         }
       } else {
-        const typeLabel = `${meta.type}${meta.devOnly ? ' [devOnly]' : ''}`;
+        const typeLabel = formatType(meta.type, meta.devOnly);
         value = `{${typeLabel}}`;
       }
 

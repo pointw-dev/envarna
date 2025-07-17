@@ -1,5 +1,6 @@
 import yaml from 'yaml';
 import { extractEnvSpec } from './extractEnvSpec.js';
+import { formatType } from './formatType.js';
 
 export async function generateK8s(): Promise<string> {
   const spec = await extractEnvSpec();
@@ -42,7 +43,7 @@ export async function generateK8s(): Promise<string> {
             rawValue = meta.default; // Let YAML quote as needed
         }
       } else {
-        const typeLabel = `${meta.type}${meta.devOnly ? ' [devOnly]' : ''}`;
+        const typeLabel = formatType(meta.type, meta.devOnly);
         rawValue = `__PLACEHOLDER__{${typeLabel}}__`; // marker for post-processing
       }
 
