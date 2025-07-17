@@ -69,8 +69,8 @@ function toMarkdownTable(section: string, group: EnvVarGroup): string {
     return `${sectionHeader}${secretsLine}${descriptionLine}\n${header}\n${rows.join('\n')}${extras}`;
 }
 
-export async function writeSettingsMarkdown(): Promise<void> {
-    const spec = await extractEnvSpec();
+export async function writeSettingsMarkdown(skipDev = false): Promise<void> {
+    const spec = await extractEnvSpec(undefined, skipDev);
     const sections = Object.entries(spec)
         .map(([section, group]) => toMarkdownTable(section, group))
         .join('\n\n');

@@ -7,8 +7,8 @@ import { PROJECT_ROOT } from '../lib/paths.js';
 const envFilename = '.env.template';
 const OUTPUT_FILE = path.join(PROJECT_ROOT, envFilename);
 
-export async function writeEnvFile(): Promise<void> {
-  const spec = await extractEnvSpec();
+export async function writeEnvFile(skipDev = false): Promise<void> {
+  const spec = await extractEnvSpec(undefined, skipDev);
 
   const lines: string[] = [];
   for (const [, group] of Object.entries(spec)) {

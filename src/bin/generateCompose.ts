@@ -1,8 +1,8 @@
 import { extractEnvSpec } from './extractEnvSpec.js';
 import { formatType } from './formatType.js';
 
-export async function writeComposeEnvFile(): Promise<string> {
-    const spec = await extractEnvSpec();
+export async function writeComposeEnvFile(skipDev = false): Promise<string> {
+    const spec = await extractEnvSpec(undefined, skipDev);
 
     const lines: string[] = ['environment:'];
     for (const [, group] of Object.entries(spec)) {

@@ -26,25 +26,30 @@ const pkg = JSON.parse(readFileSync(pkgPath, 'utf-8'))
 yargs(hideBin(process.argv))
   .version(pkg.version)
   .scriptName('envarna')
+  .option('skip-dev', {
+    type: 'boolean',
+    default: false,
+    describe: 'Exclude fields marked @devOnly',
+  })
 
-  .command('list', 'Display settings details', () => {}, async () => {
-    await printSettings()
+  .command('list', 'Display settings details', () => {}, async argv => {
+    await printSettings(argv.skipDev as boolean)
   })
-  .command('env', 'Write ".env.template"', () => {}, async () => {
-    await writeEnvFile()
+  .command('env', 'Write ".env.template"', () => {}, async argv => {
+    await writeEnvFile(argv.skipDev as boolean)
   })
-  .command('md', 'Write "SETTINGS.md"', () => {}, async () => {
-    await writeSettingsMarkdown()
+  .command('md', 'Write "SETTINGS.md"', () => {}, async argv => {
+    await writeSettingsMarkdown(argv.skipDev as boolean)
   })
-  .command('values', 'Write "values.yaml"', () => {}, async () => {
-    await writeValuesYaml()
+  .command('values', 'Write "values.yaml"', () => {}, async argv => {
+    await writeValuesYaml(argv.skipDev as boolean)
   })
-  .command('compose', 'Display docker-compose style environment yaml', () => {}, async () => {
-    const output = await writeComposeEnvFile();
+  .command('compose', 'Display docker-compose style environment yaml', () => {}, async argv => {
+    const output = await writeComposeEnvFile(argv.skipDev as boolean);
     console.log(output);
   })
-  .command('k8s', 'Display kubernetes style env var structure', () => {}, async () => {
-      const output = await generateK8s();
+  .command('k8s', 'Display kubernetes style env var structure', () => {}, async argv => {
+      const output = await generateK8s(argv.skipDev as boolean);
       console.log(output);
     }
   )
@@ -67,7 +72,7 @@ yargs(hideBin(process.argv))
       default: false,
     }),
     async argv => {
-      const output = await generateJson(argv.root ?? null, argv.flat, argv.code);
+      const output = await generateJson(argv.root ?? null, argv.flat, argv.code, argv.skipDev as boolean);
       console.log(output);
     }
   )
@@ -90,12 +95,12 @@ yargs(hideBin(process.argv))
         default: false,
     }),
     async argv => {
-      const output = await generateYaml(argv.root, argv.flat, argv.code);
+      const output = await generateYaml(argv.root, argv.flat, argv.code, argv.skipDev as boolean);
       console.log(output);
     }
   )
-  .command('raw', 'Display the raw structure extracted from the settings classes used to power the other formats', () => {}, async () => {
-    const output = await writeRawEnvSpec();
+  .command('raw', 'Display the raw structure extracted from the settings classes used to power the other formats', () => {}, async argv => {
+    const output = await writeRawEnvSpec(argv.skipDev as boolean);
     console.log(output);
   })
   .demandCommand()

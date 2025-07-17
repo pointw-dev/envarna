@@ -5,8 +5,8 @@ function padRight(value: string, width: number): string {
     return value + ' '.repeat(width - value.length);
 }
 
-export async function printSettings(): Promise<void> {
-    const spec = await extractEnvSpec();
+export async function printSettings(skipDev = false): Promise<void> {
+    const spec = await extractEnvSpec(undefined, skipDev);
 
     for (const [section, group] of Object.entries(spec)) {
         const entries = Object.entries(group).filter(([k]) => k !== '_description' && k !== '_hasAlias');

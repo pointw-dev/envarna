@@ -24,6 +24,7 @@ Commands:
 
 Options:
   --version  Show version number                                       [boolean]
+  --skip-dev  Exclude fields marked @devOnly                            [boolean]
   --help     Show help                                                 [boolean]
 ```
 

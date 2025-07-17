@@ -3,8 +3,13 @@ import { extractEnvSpec } from './extractEnvSpec.js';
 import { formatType } from './formatType.js';
 import yaml from 'yaml';
 
-export async function generateYaml(root: string = 'settings', flat = false, useCodeAsKey = false): Promise<string> {
-  const spec = await extractEnvSpec();
+export async function generateYaml(
+  root: string = 'settings',
+  flat = false,
+  useCodeAsKey = false,
+  skipDev = false
+): Promise<string> {
+  const spec = await extractEnvSpec(undefined, skipDev);
   const output: Record<string, any> = {};
   output[root] = {};
 

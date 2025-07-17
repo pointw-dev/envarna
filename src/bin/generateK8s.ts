@@ -2,8 +2,8 @@ import yaml from 'yaml';
 import { extractEnvSpec } from './extractEnvSpec.js';
 import { formatType } from './formatType.js';
 
-export async function generateK8s(): Promise<string> {
-  const spec = await extractEnvSpec();
+export async function generateK8s(skipDev = false): Promise<string> {
+  const spec = await extractEnvSpec(undefined, skipDev);
   const envList: { name: string; value: any }[] = [];
 
   for (const vars of Object.values(spec)) {
