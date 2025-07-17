@@ -16,7 +16,8 @@ export async function writeEnvFile(): Promise<void> {
       if (typeof entry !== 'object' || entry === null || !('default' in entry)) continue;
 
       const name = entry.alias ?? envar;
-      const def = entry.default ?? `{${entry.type}}`;
+      const typeLabel = `${entry.type}${entry.devOnly ? ' [devOnly]' : ''}`;
+      const def = entry.default ?? `{${typeLabel}}`;
       lines.push(`${name}=${def}`);
     }
 

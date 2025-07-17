@@ -8,7 +8,6 @@ export async function generateJson(root: string | null = null, flat = false, use
     for (const [envar, meta] of Object.entries(vars)) {
       if (envar.startsWith('_')) continue;
       if (typeof meta !== 'object' || meta == null || !('default' in meta)) continue;
-
       let value: any;
 
       if (meta.default != null) {
@@ -46,7 +45,8 @@ export async function generateJson(root: string | null = null, flat = false, use
             value = meta.default;
         }
       } else {
-        value = `{${meta.type}}`;
+        const typeLabel = `${meta.type}${meta.devOnly ? ' [devOnly]' : ''}`;
+        value = `{${typeLabel}}`;
       }
 
       const outputKey = useCodeAsKey ? meta.fieldName : meta.alias ?? envar;
