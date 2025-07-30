@@ -9,7 +9,7 @@ function findProjectRoot(startDir: string): string {
         }
         dir = path.dirname(dir);
     }
-    throw new Error('package.json not found in any parent directory.');
+    return dir
 }
 
 export const PROJECT_ROOT = findProjectRoot(process.cwd());
