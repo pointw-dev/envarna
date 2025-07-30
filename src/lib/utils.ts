@@ -24,8 +24,25 @@ export function createSettingsProxy<T extends Record<string, () => any>>(loaders
 } {
   const localLoaders: Record<string, () => any> = loaders ?? {};
 
-  return new Proxy({}, {
+  let proxy: any;
+  const handler: ProxyHandler<any> = {
     get(_, key: string | symbol) {
+      if (key === 'toJSON') {
+        return () => {
+          const result: Record<string, unknown> = {};
+          for (const prop of Reflect.ownKeys(proxy)) {
+            if (typeof prop !== 'string') continue;
+            const value = (proxy as any)[prop];
+            if (value instanceof Promise) {
+              throw new Error(
+                'Settings contain async loaders. Call initializeSettings() before dumping to JSON.'
+              );
+            }
+            result[prop] = value && typeof value.toJSON === 'function' ? value.toJSON() : value;
+          }
+          return result;
+        };
+      }
       if (typeof key !== "string") {
         return undefined;
       }
@@ -68,7 +85,10 @@ export function createSettingsProxy<T extends Record<string, () => any>>(loaders
       }
       return undefined;
     }
-  }) as {
+  };
+
+  proxy = new Proxy({}, handler);
+  return proxy as {
     [K in keyof T]: ReturnType<T[K]>;
   };
 }
