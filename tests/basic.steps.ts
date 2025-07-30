@@ -5,7 +5,8 @@ import { BaseSettings, setting } from '../src';
 
 
 type SettingsClass = typeof BaseSettings;
-interface TestWorld {
+
+interface BasicWorld {
     settingsClass?: SettingsClass;
     settings?: BaseSettings;
 }
@@ -30,7 +31,7 @@ Given('an .env file that contains:', function (fileString: string) {
     env.loadDotenv();
 });
 
-Given('a class named ApiSettings includes a setting named host', function(this: TestWorld) {
+Given('a class named ApiSettings includes a setting named host', function(this: BasicWorld) {
     class ApiSettings extends BaseSettings {
         // @ts-ignore
         @setting.string()
@@ -40,7 +41,7 @@ Given('a class named ApiSettings includes a setting named host', function(this: 
     this.settingsClass = ApiSettings
 })
 
-Given('a class named ApiSettings includes a setting named apiKey', function(this: TestWorld) {
+Given('a class named ApiSettings includes a setting named apiKey', function(this: BasicWorld) {
     class ApiSettings extends BaseSettings {
         // @ts-ignore
         @setting.string()
