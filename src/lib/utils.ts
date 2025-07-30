@@ -1,5 +1,6 @@
 
 import { camelCase } from "change-case";
+import { getInitializedSetting, getInitializedKeys, settingsInitialized } from "./initializeSettings";
 
 export function extractPrefixedEnv(prefix: string, env = process.env): Record<string, string> {
   const result: Record<string, string> = {};
@@ -18,24 +19,51 @@ export function toEnvVar(className: string, propName: string): string {
 }
 
 
-export function createSettingsProxy<T extends Record<string, () => any>>(loaders: T): {
+export function createSettingsProxy<T extends Record<string, () => any>>(loaders?: T): {
   [K in keyof T]: ReturnType<T[K]>;
 } {
+  const localLoaders: Record<string, () => any> = loaders ?? {};
+
   return new Proxy({}, {
     get(_, key: string | symbol) {
-      if (typeof key !== "string" || !(key in loaders)) {
+      if (typeof key !== "string") {
         return undefined;
       }
 
-      return loaders[key as keyof T](); // Call fresh every time
+      if (settingsInitialized()) {
+        const value = getInitializedSetting(key);
+        if (value !== undefined) {
+          return value;
+        }
+        if (key in localLoaders) {
+          return localLoaders[key]();
+        }
+        throw new Error(
+          `Settings for '${key}' accessed but not initialized.`
+        );
+      }
+
+      if (key in localLoaders) {
+        return localLoaders[key]();
+      }
+
+      throw new Error(
+        `Settings for '${key}' accessed before initialization. Did you forget to call initializeSettings()?`
+      );
     },
-    ownKeys: () => Reflect.ownKeys(loaders),
+    ownKeys: () => {
+      if (settingsInitialized()) {
+        const keys = new Set<string>([...Object.keys(localLoaders), ...getInitializedKeys()])
+        return Array.from(keys)
+      }
+      return Reflect.ownKeys(localLoaders)
+    },
     getOwnPropertyDescriptor: (_, key) => {
-      if (typeof key === "string" && key in loaders) {
+      if (typeof key === "string" && key in localLoaders) {
         return {
           configurable: true,
           enumerable: true,
-          value: loaders[key as keyof T],
+          value: localLoaders[key],
         };
       }
       return undefined;
