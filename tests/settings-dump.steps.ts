@@ -51,5 +51,5 @@ When('I dump the settings object', function (this: DumpWorld) {
 });
 
 Then('the result is stringified JSON', function () {
-  expect(this.dump).to.be.instanceof('string')
+  expect(this.dump).to.be.a('string')
 });
