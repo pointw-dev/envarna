@@ -54,5 +54,10 @@ When('I initialize settings', async function (this: LoaderWorld) {
 });
 
 Then("the setting {string} key's value is {string}", async function (this: LoaderWorld, key: string, expected: string) {
-  expect(this.settings[key]).to.eq(expected);
+  const parts = key.split('.')
+  let current: any = this.settings
+  for (const part of parts) {
+    current = current[part]
+  }
+  expect(current).to.eq(expected);
 });
