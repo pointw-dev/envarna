@@ -1,10 +1,14 @@
 import { strict as assert } from 'assert'
-import { BaseSettings, setting, createSettingsProxy, initializeSettings } from '../src';
+import { BaseSettings, setting, createSettingsProxy, initializeLoaders } from '../src';
 
 
 class MongoSettings extends BaseSettings {
   @setting.string()
   uri = ''
+
+  @setting.string()
+  dbName = 'test'
+
 }
 
 const settings = createSettingsProxy()
@@ -14,7 +18,7 @@ async function fakeSecretFetch(): Promise<string> {
 }
 
 async function run() {
-  await initializeSettings({
+  await initializeLoaders({
     mongo: async () => {
       const uri = await fakeSecretFetch()
       return MongoSettings.load({ uri })

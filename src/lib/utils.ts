@@ -1,6 +1,6 @@
 
 import { camelCase } from "change-case";
-import { getInitializedSetting, getInitializedKeys, settingsInitialized } from "./initializeSettings";
+import { getInitializedSetting, getInitializedKeys, settingsInitialized } from "./initializeLoaders";
 
 export function extractPrefixedEnv(prefix: string, env = process.env): Record<string, string> {
   const result: Record<string, string> = {};
@@ -35,7 +35,7 @@ export function createSettingsProxy<T extends Record<string, () => any>>(loaders
             const value = (proxy as any)[prop];
             if (value instanceof Promise) {
               throw new Error(
-                'Settings contain async loaders. Call initializeSettings() before dumping to JSON.'
+                'Settings contain async loaders. Call initializeLoaders() before dumping to JSON.'
               );
             }
             result[prop] = value && typeof value.toJSON === 'function' ? value.toJSON() : value;
@@ -65,7 +65,7 @@ export function createSettingsProxy<T extends Record<string, () => any>>(loaders
       }
 
       throw new Error(
-        `Settings for '${key}' accessed before initialization. Did you forget to call initializeSettings()?`
+        `Settings for '${key}' accessed before initialization. Did you forget to call initializeLoaders()?`
       );
     },
     ownKeys: () => {

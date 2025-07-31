@@ -7,7 +7,7 @@ export type SettingsLoaders = Record<string, () => SyncOrAsync<BaseSettings>>
 const registry: Record<string, BaseSettings> = {}
 let isInitialized = false
 
-export async function initializeSettings(loaders: SettingsLoaders): Promise<void> {
+export async function initializeLoaders(loaders: SettingsLoaders): Promise<void> {
   const entries = await Promise.all(
     Object.entries(loaders).map(async ([key, loader]) => {
       const value = await loader()

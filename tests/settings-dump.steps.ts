@@ -19,7 +19,7 @@ After(() => {
   env.cleanup()
 })
 
-Given('a settings object created following the recommended pattern', function (this: DumpWorld) {
+Given('a settings object created following the standard pattern', function (this: DumpWorld) {
   class ApiSettings extends BaseSettings {
     @setting.string()
     host: string = 'host'
@@ -37,6 +37,9 @@ Given('a settings object created following the recommended pattern', function (t
     @setting.string()
     @secret()
     connectionString: string = 'shhh'
+
+    @setting.string()
+    dbName: string = 'dev-db'
   }
 
   this.settings = createSettingsProxy({
