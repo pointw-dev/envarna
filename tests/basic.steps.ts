@@ -46,10 +46,15 @@ Given('a class named ApiSettings includes a setting named apiKey', function(this
         // @ts-ignore
         @setting.string()
         apiKey: string = 'nope'
+
+        @setting.string()
+        name: string = 'default'
     }
 
     this.settingsClass = ApiSettings
 })
+
+Given('the class also includes a setting named name', function() { return true; } );
 
 
 When('I load settings', function () {

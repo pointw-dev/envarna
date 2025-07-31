@@ -53,7 +53,7 @@ When('I initialize settings', async function (this: LoaderWorld) {
   await this.initialize();
 });
 
-Then("the setting {string} key's value is {string}", async function (this: LoaderWorld, key: string, expected: string) {
+Then("the setting {string} has a value of {string}", async function (this: LoaderWorld, key: string, expected: string) {
   const parts = key.split('.')
   let current: any = this.settings
   for (const part of parts) {

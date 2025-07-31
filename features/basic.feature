@@ -30,10 +30,13 @@ Feature: The settings defined in a subclass of BaseSettings are populated in var
     And an .env file that contains:
     """
     API_HOST=from-dotenv
+    API_NAME=from-dotenv
     """
     And a class named ApiSettings includes a setting named host
+    And the class also includes a setting named name
     When I load settings with a value "from-injection"
     Then the setting "host" value is "from-injection"
+    And the setting "name" value is "from-dotenv"
 
   Scenario: repeating prefixes
     Given the environment variable "API_API_KEY" is set to "from-process"
