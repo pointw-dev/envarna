@@ -24,16 +24,14 @@ Given('a settings object created following the async loading pattern', function 
     return new Promise(resolve => setTimeout(resolve, milliseconds));
   }
   async function simulateGetUri(): Promise<string> {
-    console.log("Starting delayed operation...");
     await sleep(500); // Simulate a 2-second delay
-    console.log("Delayed operation complete!");
-    return 'mongodb://localhost:27017';
+    return 'mongodb://secret-uri'
   }
 
   class DbSettings extends BaseSettings {
     @setting.string()
     @secret()
-    connectionString: string = 'shhh'
+    connectionString: string = 'mongodb://localhost:27017'
 
     @setting.string()
     name: string = 'dev-db'
