@@ -54,7 +54,12 @@ Given('a class named ApiSettings includes a setting named apiKey', function(this
     this.settingsClass = ApiSettings
 })
 
-Given('the class also includes a setting named name', function() { return true; } );
+Given('the class also includes a setting named name', function(this: BasicWorld) {
+    const Klass = this.settingsClass! as any;
+    // Dynamically add the field to the existing class so previous fields remain
+    setting.string()(Klass.prototype, 'name');
+    Klass.prototype.name = 'default';
+});
 
 
 When('I load settings', function () {

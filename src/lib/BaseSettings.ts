@@ -63,26 +63,29 @@ export class BaseSettings {
     const defaults = Object.fromEntries(Object.entries(instance));
 
     const testOverride = BaseSettings._testOverrides.get(this);
-    let merged: Record<string, unknown> = {};
+    let merged: Record<string, unknown> = { ...defaults };
+
+    // Load values from environment variables and .env file
+    dotenv.config({ path: DOTENV_PATH });
+    const prefix = this.name.replace(/Settings$/, '').toUpperCase() + '_';
+    const rawEnv = extractPrefixedEnv(prefix, process.env);
+    const overrides = getAliases(this);
+
+    for (const [key, envvar] of Object.entries(overrides)) {
+      const val = process.env[envvar];
+      if (val !== undefined) {
+        rawEnv[key] = val;
+      }
+    }
+
+    merged = { ...merged, ...rawEnv };
+
+    if (values) {
+      merged = { ...merged, ...values };
+    }
 
     if (testOverride) {
-      merged = { ...defaults, ...testOverride };
-    } else if (values) {
-      merged = { ...defaults, ...values };
-    } else {
-      dotenv.config({ path: DOTENV_PATH });
-      const prefix = this.name.replace(/Settings$/, '').toUpperCase() + '_';
-      const rawEnv = extractPrefixedEnv(prefix, process.env);
-      const overrides = getAliases(this);
-
-      for (const [key, envvar] of Object.entries(overrides)) {
-        const val = process.env[envvar];
-        if (val !== undefined) {
-          rawEnv[key] = val;
-        }
-      }
-
-      merged = { ...defaults, ...rawEnv };
+      merged = { ...merged, ...testOverride };
     }
 
     const parsed = schema.safeParse(merged);
