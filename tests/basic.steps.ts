@@ -2,6 +2,8 @@ import { expect } from 'chai';
 import { Given, When, Then, Before, After } from '@cucumber/cucumber'
 import { EnvFixture } from './env-fixture'
 import { BaseSettings, setting } from '../src';
+import { set } from "zod";
+import { de } from "zod/dist/types/v4/locales";
 
 
 type SettingsClass = typeof BaseSettings;
@@ -51,6 +53,37 @@ Given('a class named ApiSettings includes a setting named apiKey', function(this
     this.settingsClass = ApiSettings
 })
 
+Given('a class named ApiSettings includes a setting named {string} of type {string}', function(this: BasicWorld, name: string, type: string) {
+  class ApiSettings extends BaseSettings {
+
+  }
+
+  this.settingsClass = ApiSettings
+  const Klass = this.settingsClass! as any;
+  let decorator: PropertyDecorator
+  switch (type) {
+    case 'string':
+      decorator = setting.string();
+      break;
+    case 'number':
+      decorator = setting.number();
+      break;
+    case 'boolean':
+      decorator = setting.boolean();
+      break;
+    case 'date':
+      decorator = setting.date();
+      break;
+    case 'array':
+      decorator = setting.array()
+      break;
+    default:
+      throw new Error(`Unknown type "${type}"`);
+  }
+  decorator(Klass.prototype, name)
+})
+
+
 Given('the class also includes a setting named name', function(this: BasicWorld) {
     const Klass = this.settingsClass! as any;
     // Dynamically add the field to the existing class so previous fields remain
@@ -69,6 +102,6 @@ When('I load settings with a value {string}', function (injection: string) {
 
 
 Then('the setting {string} value is {string}', function (settingKey: string, expected: string) {
-    const actual = this.settings[settingKey];
+    const actual = this.settings[settingKey].toString();
     expect(actual).to.equal(expected);
 });
