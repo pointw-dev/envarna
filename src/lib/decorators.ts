@@ -17,7 +17,7 @@ export function setting(schema: ZodTypeAny): PropertyDecorator {
 // Optional sugar methods (non-coercing by default)
 setting.string = () => setting(z.string());
 setting.number = () => setting(z.coerce.number());
-setting.boolean = () => setting(z.coerce.boolean());
+setting.boolean = () => setting(z.preprocess(parseIfString, z.boolean()));
 setting.date = () => setting(z.coerce.date());
 setting.array = <T extends ZodTypeAny = z.ZodString>(itemSchema?: T) =>
     setting(z.array(itemSchema ?? z.string()));
@@ -55,7 +55,7 @@ export function devOnly(): PropertyDecorator {
 export const v = {
   string: z.string,
   number: z.coerce.number,
-  boolean: z.coerce.boolean,
+  boolean: () => z.preprocess(parseIfString, z.boolean()),
   date: z.coerce.date,
   object: z.object,
   enum: <T extends string>(values: [T, ...T[]]) => z.enum(values),
