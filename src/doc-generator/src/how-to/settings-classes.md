@@ -24,7 +24,7 @@ export class SmtpSettings extends BaseSettings {
 ## Anatomy of the settings class
 ### import
 > line 1
-* At a minimum import the `BaseSettings` class and the `settings` decorator
+* At a minimum import the `BaseSettings` class and the `setting` decorator
 * import other [decorators](decorators) as needed
 
 ### Class definition
@@ -39,7 +39,7 @@ export class SmtpSettings extends BaseSettings {
  
 ### Field decorators
 > lines 4, 7, 10
-* each setting is a field in the class, and must be decorated with `@settings`
+* each setting is a field in the class, and must be decorated with `@setting`
 * decorators provide the validation rule for the incoming environment variable to be applied to the field
   * malformed environment variables cause an early rejection at startup
 * basic decorators are shown in the example, one of

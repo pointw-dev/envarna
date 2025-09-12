@@ -14,41 +14,41 @@ Settings are grouped into classes, each representing a coherent domain of config
 
 ```ts
 // settings/app.ts
-import { BaseSettings, settings } from 'envarna';
+import { BaseSettings, setting } from 'envarna';
 
 export class AppSettings extends BaseSettings {
-  @settings.string()
-  name: string;
+  @setting.string()
+  name!: string;
 
-  @settings.boolean()
+  @setting.boolean()
   debug: boolean = false;
 }
 ```
 
 ```ts
-// settings/page.ts
-import { BaseSettings, settings } from 'envarna';
+// settings/other.ts
+import { BaseSettings, setting } from 'envarna';
 
 export class OtherSettings extends BaseSettings {
-  @settings.number()
-  numRetries: number;
+  @setting.number()
+  numRetries!: number;
 }
 ```
 
 ### Collect your settings into a proxy
 This is optional but highly recommended.
 
-Use `createSettingsProxy()` to define a centralized `settings` object. This pattern defers loading until first access and enables test overrides.
+Use `createSettingsProxy()` to define a centralized `settings` object. Pass classes for full IntelliSense. This pattern works with lazy values by default and supports async overrides.
 
 ```ts
 // settings/index.ts
 import { createSettingsProxy } from 'envarna';
 import { AppSettings } from './app';
-import { PageSettings } from './page';
+import { OtherSettings } from './other';
 
 export const settings = createSettingsProxy({
-  app: () => AppSettings.load(),
-  other: () => OtherSettings.load(),
+  app: AppSettings,
+  other: OtherSettings,
 });
 ```
  

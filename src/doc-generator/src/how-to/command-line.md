@@ -28,6 +28,14 @@ Options:
   --help      Show help                                                 [boolean]
 ```
 
+### Flags
+
+- `--skip-dev`: omit fields decorated with `@devOnly()`.
+- `json --root <name>`: wrap output under a root object (or omit for flat).
+- `json --flat`: flatten output (no group nesting under root).
+- `json --code`: use field names as keys instead of ENVAR names.
+- `yaml --root/--flat/--code`: same as JSON for YAML output.
+
 ## list
 Display settings details
 
