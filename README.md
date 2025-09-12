@@ -41,21 +41,41 @@ The environment variables that populate the fields of the class are derived from
 Each environment variable is derived from the class name (`SMTP_`) plus the field name (`FROM_EMAIL`)
 
 
-### Create a settings object
-Taking, for example, all settings classes are defined in `src/settings`, aggregate access to their values under a `settings` object in the `index.ts` in that folder.  For example:
+### Create a settings object (typed proxy)
+If your settings classes live in `src/settings`, expose a single, typed `settings` object. Pass the classes for IntelliSense, then initialize once at startup.
 
 ```Typescript
+// src/settings/index.ts
 import { createSettingsProxy } from 'envarna'
-import { SmtpSettings } from "./smtp"
-import { MongoSettings } from "./mongo"
+import { SmtpSettings } from './smtp'
+import { MongoSettings } from './mongo'
 
 export const settings = createSettingsProxy({
-  smtp: SmtpSettings.load(),
-  mongo: MongoSettings.load()  
-});
+  smtp: SmtpSettings,
+  mongo: MongoSettings,
+})
+
+// Apply overrides (optional): resolve and cache specific keys (sync or async)
+export async function applyOverrides() {
+  await settings.$override({
+    smtp: () => SmtpSettings.load(),
+    mongo: () => MongoSettings.load(), // can be async if needed
+  })
+}
 ```
 
-This will load settings values the process environment variables, or from a `.env` file if it .  
+This loads values from process environment variables or a `.env` file. For secrets, use an async loader:
+
+```Typescript
+await settings.$override({
+  mongo: async () => {
+    const s = MongoSettings.load()
+    // e.g., fetch from a secrets manager
+    // s.uri = await getSecret('prod-mongo-uri')
+    return s
+  },
+})
+```
 
 ### Putting it all together
 
@@ -77,3 +97,92 @@ Then when you need a settings value, you use  `settings.smtp.host`
 
 
 (full docs [here](https://pointw-dev.github.io/envarna/))
+
+
+## Command Line
+
+Generate docs and environment artifacts directly from your settings classes.
+
+- Basics: `npx envarna --help` 
+  ```
+  envarna <command>
+  
+  Commands:
+    envarna list         Display settings details
+    envarna env          Write ".env.template"
+    envarna md           Write "SETTINGS.md"
+    envarna values       Write "values.yaml"
+    envarna compose      Display docker-compose style environment yaml
+    envarna k8s          Display kubernetes style env var structure
+    envarna json [root]  Display JSON settings structure
+    envarna yaml [root]  Display YAML settings structure
+    envarna raw          Display the raw structure extracted from the settings
+                         classes used to power the other formats
+  
+  Options:
+    --version   Show version number                                      [boolean]
+    --skip-dev  Exclude fields marked @devOnly          [boolean] [default: false]
+    --help      Show help                                                [boolean]
+  ```
+
+For `json` and `yaml`:
+
+- `json --root <name> --flat --code`: set root object, flatten groups, and use field names instead of ENVAR keys.
+- `yaml --root <name> --flat --code`: same for YAML output.
+
+Example
+```bash
+npx envarna list
+npx envarna env
+npx envarna json --root cfg --flat --code --skip-dev
+```
+
+
+## Testing
+
+Envarna keeps testing simple without DI or heavy mocks. Two common patterns are supported:
+
+- Per-test override: Set the value that drives behavior inside each test, then restore.
+- Suite-level override: Set once in `beforeEach` (or `beforeAll`) when shared across tests.
+
+>  Note: You can still DI or mock the module that exports `settings` , or the indivdual settings classes if preferred
+
+Per-test override (behavior-driven)
+
+```ts
+// settings/pagination.ts
+export class PaginationSettings extends BaseSettings {
+  @setting.number() maxPageSize = 10
+}
+
+// settings/index.ts (lazy proxy)
+export const settings = createSettingsProxy({ pagination: () => PaginationSettings.load() })
+
+// showWidgets.test.ts
+import { PaginationSettings } from './settings/pagination'
+import { settings } from './settings'
+
+it('prints 7 widgets when maxPageSize=7', () => {
+  try {
+    PaginationSettings.overrideForTest({ maxPageSize: 7 })
+    expect(settings.pagination.maxPageSize).toBe(7)
+  } finally {
+    PaginationSettings.clearOverride()
+  }
+})
+```
+
+Suite-level override (shared setup)
+
+```ts
+beforeEach(() => PaginationSettings.overrideForTest({ maxPageSize: 7 }))
+afterEach(() => PaginationSettings.clearOverride())
+```
+
+Jest-style mock (optional)
+
+```ts
+jest.mock('./settings', () => ({ settings: { pagination: { maxPageSize: 3 } } }))
+```
+
+Tip: For BDD or multi-scenario tests, be sure to `clearOverride()` and reset any cached keys if you used `$override` during a scenario.

@@ -58,6 +58,3 @@ Feature: The settings defined in a subclass of BaseSettings are populated in var
       | API_LOGIC    | false      | logic    | boolean |
 #      | API_CALENDAR | 2025-05-16 | calendar | date    |
 #      | API_LIST     | ["a","b"]  | list     | array   |
-
-
-
