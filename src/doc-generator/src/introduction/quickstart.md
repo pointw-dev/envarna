@@ -88,10 +88,10 @@ You can expand your schema using Zod-compatible validators with a `v` extension.
 import { BaseSettings, settings, v } from 'envarna';
 
 export class ServiceSettings extends BaseSettings {
-  @settings(v.string().length(10))
+  @setting(v.string().length(10))
   apiKey: string;
 
-  @settings(v.url())
+  @setting(v.url())
   @alias('ACME_API_URL')
   endpoint: string;
 }
@@ -130,9 +130,9 @@ If you want more control over the validation, use `v`:
 You can still use raw Zod if needed, just remember to be aware of coercion:
 
 ```ts
-@settings(v.date().min(new Date("1984-01-01")))
+@setting(v.date().min(new Date("1984-01-01")))
 // is the same as...
-@settings(z.coerce.date().min(new Date("1984-01-01")))
+@setting(z.coerce.date().min(new Date("1984-01-01")))
 ```
 
 See the sections (string formats, numbers, etc.) under [Zod's Defining schemas](https://zod.dev/api?id=strings) for more details.

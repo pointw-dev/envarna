@@ -98,7 +98,8 @@ function getSidebar() {
         text: 'Introduction',
         items: [
           { text: 'What is envarna?', link: '/introduction/what-is' },
-          { text: 'Getting started', link: '/introduction/quickstart' }
+          { text: 'Getting started', link: '/introduction/quickstart' },
+          { text: 'Motivations', link: '/introduction/motivations' }
         ]
       },
       {
@@ -107,9 +108,20 @@ function getSidebar() {
           { text: 'Settings classes', link: '/how-to/settings-classes' },
           { text: 'The <code>settings</code> object',  link: '/how-to/settings-object' },
           { text: 'Decorators',  link: '/how-to/decorators' },
+          { text: 'Async loading', link: '/how-to/async-loading' },
           { text: 'Command line', link: '/how-to/command-line' },
           { text: 'Testing',  link: '/how-to/testing' },
           { text: 'Module Format Compatibility',  link: '/how-to/module-compatibility' },
+        ]
+      },
+      {
+        text: 'Reference',
+        items: [
+          { text: 'Decorators', link: '/reference/decorators' },
+          { text: 'Validation with v', link: '/reference/validation' },
+          { text: 'Naming & aliases', link: '/reference/naming-aliases' },
+          { text: 'Security & redaction', link: '/reference/security-redaction' },
+          { text: 'Command line', link: '/reference/command-line' },
         ]
       }
     ]

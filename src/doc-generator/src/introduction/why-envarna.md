@@ -28,7 +28,7 @@ This works—until:
 With envarna, defaults, coercion, and validation are expressed declaratively:
 
 ```ts
-@settings(v.number().int().positive().default(10))
+@setting(v.number().int().positive().default(10))
 maxPageSize: number;
 ```
 

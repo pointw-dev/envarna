@@ -1,40 +1,91 @@
 # Decorators
 
-<centered-image src="/img/work-in-progress.png" />
+## @setting
+`@setting` declares a setting field and its basic type. Use the helpers for common cases:
 
-## `v`
-* `v` is used with `@settings()` to create more complex validation chains 
-*  `v` is for "validation".  It is a light extension of `z` from Zod designed for use in a settings environment.
-* automatic coercion (e.g. `v.number()` accepts strings like "42")
-* access to Zod validations e.g.:
-  ```ts
-  @setting(v.url())
-  @setting(v.email())
-  @setting(v.string().startsWith('aaa').includes('mmm').length(15).toUpperCase())
-  ```
-* handling for arrays (and soon objects)
+```ts
+@setting.string()
+host: string = 'localhost'
 
-> You can still use raw Zod if needed, just remember to be aware of coercion:
+@setting.number()
+port!: number
 
-See the sections (string formats, numbers, etc.) under [Zod's Defining schemas](https://zod.dev/api?id=strings) for more details on building validation chains for each type.
+@setting.boolean()
+debug = false
 
+@setting.date()
+launch!: Date
+
+@setting.array()         // defaults to array of strings
+hosts!: string[]
+
+@setting.object({ /* shape */ }) // for structured objects when needed
+```
+
+Notes
+- Decorators define how environment variables are coerced and validated into strongly typed fields.
+- Defaults can be provided via assignment (e.g., `= 'localhost'`) or via the validator chain (see `v`).
 
 ## @secret
-* marks a field as a secret
-* adds this note to generated formats (e.g. `npx envarna list`)
-* prevents typical log dumps from revealing the secret value (replaced with `***`)
+- Marks a field as sensitive.
+- Appears as `(secret)` in CLI/list output.
+- Redacts in JSON dumps (`toJSON` shows `'****'`).
+
+```ts
+@setting.string()
+@secret()
+password?: string
+```
 
 ## @alias
-* allows you to set an environment variable name to be used to populate this field
+- Overrides the derived environment variable name for a field.
 
-## @pushToEnv
-* if the matching environment variable for this field is missing, the default supplied to this field is exported to that envar.
-* this is handy for setting up a dev version that pushes environment variable values for use by external services that require them
-* handy when needed, but use with caution!
+```ts
+@setting.string()
+@alias('GOOGLE_CLOUD_PROJECT')
+projectId = 'my-project'
+```
 
 ## @devOnly
-* marks a field as intended only for development use
-* add this note to generated formats (e.g. `npx envarna list`)
-* does not alter any functionality - documentation/scripting purposes only
+- Indicates a field is intended for development usage.
+- Surfaces in CLI/list output and can be omitted with `--skip-dev`.
+- Does not change runtime behavior.
 
+```ts
+@setting.string()
+@devOnly()
+localOnlyFlag?: string
+```
 
+## `v` (validation builder)
+`v` composes richer validation while handling coercion (numbers, booleans, dates, arrays, etc.). Use with `@setting(v.*)`:
+
+```ts
+@setting(v.number().int().min(1).max(10).default(5))
+retries!: number
+
+@setting(v.enum(['debug','info','warn','error']))
+logLevel!: string
+
+@setting(v.string().email())
+contact!: string
+```
+
+See [Validation with v](/how-to/validation) for more recipes.
+
+## @pushToEnv (use sparingly)
+Writes the field's value back into `process.env` (using the alias if present) when missing. This can be handy for local tooling that expects env vars, but it carries risks:
+
+```ts
+@setting.string()
+@pushToEnv()
+host = 'localhost'
+```
+
+Warnings
+- Hidden side effects: Mutating `process.env` at runtime can surprise other code and tests.
+- Coupling: Makes your app's behavior depend on write‑time ordering and may mask missing env in non‑JS tooling.
+- Propagation: Child processes/tests may inherit mutated values, creating hard‑to‑debug flakiness.
+- Security: Be extra cautious not to push sensitive values (even though `@secret()` redacts in JSON, `process.env` is readable).
+
+Prefer using it only for local development ergonomics; avoid in production paths unless you fully control the environment.

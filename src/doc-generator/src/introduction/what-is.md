@@ -1,8 +1,8 @@
 # What is envarna?
 
-Envarna is a TypeScript library that helps you manage application configuration. These are the settings that control how an application behaves and how it connects to other services.  It is a lightweight wrapper over the [Zod validation library](https://zod.dev/api?id=strings), the [dotenv environment variable loader](https://www.npmjs.com/package/dotenv), with some syntactic sugar to make it all easy to use.
+Envarna is a TypeScript library that helps you manage your application's settings. These are the settings that control how an application behaves and how it connects to other services.  Envarna is a lightweight wrapper over the [Zod validation library](https://zod.dev/api?id=strings), the [dotenv environment variable loader](https://www.npmjs.com/package/dotenv), with some syntactic sugar to make it all easy to use.
 
-Most applications use environment variables to configure things like database connection strings, feature flags, limits, API keys,  ports, etc. And most of the time, that means reaching for `process.env`, either directly or through a helper like `dotenv`.
+Many applications use environment variables to configure things like database connection strings, feature flags, rate limits, API keys,  ports, etc. Most of the time, that means reaching for `process.env` and `dotenv`.
 
 That works well until it doesn't.
 
@@ -58,7 +58,7 @@ import { createSettingsProxy } from 'envarna';
 import { PaginationSettings } from './pagination';
 
 export const settings = createSettingsProxy({
-  pagination: () => PaginationSettings.load(),
+  pagination: PaginationSettings,
 });
 ```
 

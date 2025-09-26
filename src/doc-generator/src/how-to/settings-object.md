@@ -7,21 +7,29 @@ This is optional but highly recommended.
 
 In the `index.ts` file, you aggregate all settings classes under a single `settings` object, then lazy-load them.
 
-Use `createSettingsProxy()` to define a centralized `settings` object. This pattern defers loading until first access and enables test overrides.
+Use `createSettingsProxy()` to define a centralized `settings` object. Prefer passing classes for a fully typed shape.
 
 ```ts
 // settings/index.ts
 import { createSettingsProxy } from 'envarna';
 import { AppSettings } from './app';
-import { PageSettings } from './page';
+import { OtherSettings } from './other';
 
 export const settings = createSettingsProxy({
-  app: () => AppSettings.load(),
-  other: () => OtherSettings.load(),
-});
+  app: AppSettings,
+  other: OtherSettings,
+})
+
+// Optionally resolve + cache specific groups (sync/async overrides)
+export async function applyOverrides() {
+  await settings.$override({
+    app: () => AppSettings.load(),
+    // other: async () => OtherSettings.load(),
+  })
+}
 ```
 
-> NOTE: earlier versions of envarna used this simpler pattern:
+> NOTE: You can also use a simpler, eager pattern:
 > ```typescript
 > import { AppSettings } from './app';
 > import { PageSettings } from './page';
@@ -31,7 +39,14 @@ export const settings = createSettingsProxy({
 >   other: OtherSettings.load(),
 > };
 > ```
-> This can still be used, but will introduce challenges if you have complicated testing of how these values influence your application.  The good news is if you start with the simpler version, it can be changed to the recommended version later without affecting the code that uses these values.
+> This can still be used, but it makes test overrides and async sources less ergonomic. You can migrate to the proxy at any time without changing call sites.
+
+## Lazy vs cached values
+
+- Lazy (default): Keys not passed to `$override` are computed on each access via `Class.load()`. They reflect changes to `process.env` over time.
+- Cached (after `$override`): Keys you pass are resolved once and cached; later reads do not consult the environment. Instances are not frozen.
+
+For any async source (secrets/DB), include that key in `$override` before first use to preserve synchronous DX.
 
 ## Injecting values
 The `.load()` function takes an optional object.  When passed to `.load()` that object's values supersede any default value and any environment variable.  The object can add only the values you want - all others will behave as normal.
@@ -56,9 +71,11 @@ SMPT_FROM_MAIL=billing-system@example.org
 ```
 When we build the settings object, we can force `port` to be 666:
 ```typescript
-const settings = {
-    smtp: () => SmtpSettings.load({port: 666})
-}
+export const settings = createSettingsProxy({
+  smtp: SmtpSettings,
+})
+
+await settings.$override({ smtp: () => SmtpSettings.load({ port: 666 }) })
 ```
 This will result in the following:
 
@@ -81,24 +98,23 @@ import { MongoSettings } from './mongo';
 import { GoogleSettings } from './google';
 
 export const settings = createSettingsProxy({
-  app: () => AppSettings.load(),
-  google: () => GoogleSettings.load(),
-  mongo: () => loadMongoSettings(),
+  app: AppSettings,
+  google: GoogleSettings,
+  mongo: MongoSettings,
 });
 
-function loadMongoSettings() {
-  const app = AppSettings.load(); // safe: can be overridden in tests
+export async function applyOverrides() {
+  await settings.$override({
+    mongo: async () => {
+      const app = AppSettings.load();
+      if (!app.loadSettingsFromGcp) return MongoSettings.load();
 
-  if (!app.loadSettingsFromGcp) {
-    return MongoSettings.load();
-  }
-
-  // load from GCP
-  const google = GoogleSettings.load(); // also safe: can be overridden
-  const secretManager = new SecretManagerServiceClient();
-
-  const result = syncFetchMongoUriFromSecretManager(app.name, google.cloudProject); // see below
-  return MongoSettings.load({ uri: result });
+      const google = GoogleSettings.load();
+      const secretManager = new SecretManagerServiceClient();
+      const result = await fetchMongoUriFromSecretManager(app.name, google.cloudProject);
+      return MongoSettings.load({ uri: result });
+    },
+  })
 }
 ```
 

@@ -1,8 +1,12 @@
 # Testing
 
-<centered-image src="/img/work-in-progress.png" />
+Testing should not force you into DI or brittle `process.env` mutations. Envarna is built to make tests straightforward:
 
-When you need to test your application's behaviour in response to different values of incoming environment variables...
+- Lazy loading enables late-bound overrides with `Class.overrideForTest()` — no DI, no module reloads.
+- Keys you do not pass to `$override` remain “live” and reflect `process.env` changes on each access.
+- Async sources (e.g., secrets) can be applied up front via an app helper that calls `settings.$override({...})`.
+
+Below are two practical patterns, each with a Jest-style alternative where mocking is preferred.
 
 ## Set once
 
@@ -28,7 +32,7 @@ describe('Sender', () => {
 })
 ```
 
-Alternately
+Alternately (Jest-style mock)
 
 ```typescript
 import { sendEmail } from '../src/lib/sender'
@@ -97,7 +101,7 @@ afterEach(() => {
 ```
 
 
-Alternately
+Alternately (Jest-style mock)
 
 ```typescript
 import { showWidgets } from "../src/lib/simple";
