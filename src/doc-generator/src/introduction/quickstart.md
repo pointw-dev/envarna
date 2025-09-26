@@ -1,5 +1,5 @@
 # Getting started
-This quick start guide walks you through setting up envarna in your project, creating your first settings classes, and gradually layering in validation and more advanced features.
+This quick start gets you productive fast. Define a couple of settings, wire them into a proxy, and you’re off. Inline links point to deeper docs when you want more.
 
 ## Installation
 
@@ -10,146 +10,193 @@ npm install envarna
 ## Basic Usage
 
 ### Create settings classes
-Settings are grouped into classes, each representing a coherent domain of configuration. For example, general application settings might live in `AppSettings`, while database settings go in `MongoSettings`.
+Settings are grouped into classes by concern. Start small, then add a richer example.
 
 ```ts
 // settings/app.ts
-import { BaseSettings, setting } from 'envarna';
+import { BaseSettings, setting, v } from 'envarna'
 
 export class AppSettings extends BaseSettings {
   @setting.string()
-  name!: string;
+  name: string = 'MyApp'
 
-  @setting.boolean()
-  debug: boolean = false;
+  @setting(v.enum(['debug','info','warn','error']))
+  logLevel: string = 'info'
 }
 ```
 
 ```ts
-// settings/other.ts
-import { BaseSettings, setting } from 'envarna';
+// settings/smtp.ts
+import { BaseSettings, setting, secret, v } from 'envarna'
 
-export class OtherSettings extends BaseSettings {
+export class SmtpSettings extends BaseSettings {
+  @setting.string()
+  host: string = 'localhost'
+
   @setting.number()
-  numRetries!: number;
+  port: number = 25
+
+  @setting.string()
+  from: string = 'noreply@example.org'
+
+  // Credentials are optional individually, but must be set together
+  @setting(v.string().optional())
+  username?: string
+
+  @setting(v.string().optional())
+  @secret()
+  password?: string
+
+  // Cross‑field check: both username and password or neither
+  protected override validate(): void {
+    const u = this.username !== undefined
+    const p = this.password !== undefined
+    if (u !== p) {
+      throw new Error('Both username and password must be set together or left undefined.')
+    }
+  }
 }
 ```
 
 ### Collect your settings into a proxy
-This is optional but highly recommended.
-
-Use `createSettingsProxy()` to define a centralized `settings` object. Pass classes for full IntelliSense. This pattern works with lazy values by default and supports async overrides.
+Use `createSettingsProxy()` to define a centralized `settings` object. Pass classes for full IntelliSense. This pattern supports lazy loading and async overrides.
 
 ```ts
 // settings/index.ts
-import { createSettingsProxy } from 'envarna';
-import { AppSettings } from './app';
-import { OtherSettings } from './other';
+import { createSettingsProxy } from 'envarna'
+import { AppSettings } from './app'
+import { SmtpSettings } from './smtp'
 
 export const settings = createSettingsProxy({
   app: AppSettings,
-  other: OtherSettings,
-});
+  smtp: SmtpSettings,
+})
 ```
  
 ### Use your settings in application code
 
 ```ts
 // main.ts
-import { settings } from './settings';
+import { settings } from './settings'
 
-if (settings.app.debug) {
-  console.debug(`Retry count ${settings.other.numRetries}`);
-}
+console.log(`[${settings.app.name}] SMTP → ${settings.smtp.host}:${settings.smtp.port}`)
 ```
 
 ### Provide environment variables
-Envarna loads the settings with values from environment variables. The names of these variables are derived from:
+Envarna loads values from environment variables. Names are derived from:
 
-* The **class name** (e.g., `OtherSettings`) is used as a prefix, with `Settings` stripped and converted to uppercase: `OTHER_`
-* Each **field name** (e.g., `numRetries`) is transformed from camelCase to uppercase with underscores: `NUM_RETRIES`
-* The full environment variable becomes: `APP_NAME` , `OTHER_NUM_RETRIES`
+* The **class name** with `Settings` stripped and uppercased: `AppSettings` → `APP_`, `SmtpSettings` → `SMTP_`
+* The **field name** uppercased with underscores: `logLevel` → `LOG_LEVEL`, `from` → `FROM`
+* Combined: `APP_NAME`, `APP_LOG_LEVEL`, `SMTP_HOST`, `SMTP_PORT`, `SMTP_FROM`
 
-By default, envarna loads variables from first from the process environment (`process.env`) and secondly (if it exists) from `.env` file using `dotenv`.
+By default, envarna reads variables first from `process.env`, then from a local `.env` (if present) via `dotenv`.
 
 ```plaintext
-APP_NAME=MyApp
-APP_DEBUG=true
-OTHER_NUM_RETRIES=50
+APP_NAME=My Worker
+APP_LOG_LEVEL=info
+SMTP_HOST=mail.example.org
+SMTP_PORT=587
+SMTP_FROM=noreply@example.org
+# SMTP_USERNAME and SMTP_PASSWORD are optional but must be set together
 ```
 
-If a required variable is missing (without a default) or is malformed, envarna will throw a validation error at startup.
+If a required variable is missing (and no default is provided) or is malformed, envarna throws a validation error at startup.
 
 ## Beyond the basics
-You can expand your schema using Zod-compatible validators with a `v` extension.  You can also override the naming convention by providing an alias.
+Use validators for constraints, aliases for naming, arrays/objects for structure, and a proxy for composition. Here are quick examples with links to more.
 
 ```ts
-// settings/service.ts
-import { BaseSettings, settings, v } from 'envarna';
+// Validation with v (min/max, enum, email)
+import { BaseSettings, setting, v, alias } from 'envarna';
 
 export class ServiceSettings extends BaseSettings {
-  @setting(v.string().length(10))
-  apiKey: string;
+  @setting(v.number().int().min(1).max(10).default(5))
+  retries!: number;
+
+  @setting(v.enum(['debug','info','warn','error']))
+  logLevel!: string;
+
+  @setting(v.string().email())
+  contact!: string;
 
   @setting(v.url())
   @alias('ACME_API_URL')
-  endpoint: string;
+  endpoint!: string;
 }
+
+// Arrays and objects (JSON from env)
+export class DataSettings extends BaseSettings {
+  @setting(v.array(v.number()))
+  weights!: number[];              // DATA_WEIGHTS=[1,2,3]
+
+  @setting.object({ name: v.string(), age: v.number() })
+  user!: { name: string; age: number }; // DATA_USER={"name":"Ada","age":42}
+}
+
+// Secrets and redaction (safe in JSON dumps)
+import { secret } from 'envarna'
+export class DbSettings extends BaseSettings {
+  @setting.string()
+  @secret()
+  connectionString!: string;
+}
+
+// Testing: override values per test (no process.env mutation)
+// DbSettings.overrideForTest({ connectionString: 'mongodb://test' })
+// DbSettings.clearOverride()
+
+// Settings proxy: compose classes with lazy/async loaders
+import { createSettingsProxy } from 'envarna'
+export const settings = createSettingsProxy({
+  service: ServiceSettings,
+  data: DataSettings,
+  db: async () => {
+    const s = DbSettings.load()
+    // e.g., await fetch secret here if needed
+    return s
+  },
+})
 ```
 
-```plaintext
-SERVICE_API_KEY=abcdefghij
-AMCE_API_URL=https://api.example.com
-```
+See more:
+- Decorators and shapes: [Decorators](/how-to/decorators)
+- Validation recipes: [Validation with v](/how-to/validation)
+- Naming and aliases: [Naming rules](/how-to/naming-aliases)
+- Secrets and redaction: [Protect secrets](/how-to/security-redaction)
+- Testing overrides: [Testing](/how-to/testing)
+- Settings proxy and async: [Settings object](/how-to/settings-object), [Async loading](/how-to/async-loading)
 
 ## What is `v`?
-Most of the time you will decorate your setting field with one of:
-* `@setting.string()`
-* `@setting.number()`
-* `@setting.boolean()`
-* `@setting.date()`
-* `@setting.array()`
-* `@setting.object()`
-
-If you want more control over the validation, use `v`:
+`v` builds Zod validators with environment‑friendly coercion (strings → numbers/booleans/dates, JSON arrays/objects). Use it when you need constraints:
 
 ```ts
 @setting(v.number().int().min(10).max(100).default(42))
 ```
 
-`v` is for "validation".  It is a light extension of `z` from Zod designed for use in a settings environment.
-* automatic coercion (e.g. `v.number()` accepts strings like "42")
-* access to Zod validations e.g.:
-  ```ts
-  @setting(v.url())
-  @setting(v.email())
-  @setting(v.string().startsWith('aaa').includes('mmm').length(15).toUpperCase())
-  ```
-* handling for arrays and objects
-
-You can still use raw Zod if needed, just remember to be aware of coercion:
-
-```ts
-@setting(v.date().min(new Date("1984-01-01")))
-// is the same as...
-@setting(z.coerce.date().min(new Date("1984-01-01")))
-```
-
-See the sections (string formats, numbers, etc.) under [Zod's Defining schemas](https://zod.dev/api?id=strings) for more details.
+Prefer `v.*` for env safety; you can still reach for raw Zod if needed.
 
 
 ## Discover and Document Your Settings
 
 Once your settings classes are defined, you can explore and document them with envarna's CLI.
 
-To list all known settings:
+List all known settings:
 ```bash
 npx envarna list
 ```
 
-To generate a `.env.template` showing required and optional variables:
+Generate a `.env.template` of required/optional variables:
 ```bash
 npx envarna env > .env.template
+```
+
+More outputs:
+```bash
+npx envarna json --root cfg --flat --code
+npx envarna yaml --root cfg --flat --code
+npx envarna values        # Helm values.yaml
+npx envarna compose       # docker-compose environment:
+npx envarna k8s           # Kubernetes env: list
 ```
 
 This helps you avoid missing variables and makes it easier to onboard new developers or deploy to new environments.
@@ -158,11 +205,10 @@ This helps you avoid missing variables and makes it easier to onboard new develo
 
 ## What’s Next?
 
-For many projects, this is all you need. But when config complexity increases, envarna is ready:
+For many projects, this is all you need. When you need more, explore:
 
-* Load values from external sources like GCP Secret Manager
-* Use conditional logic (e.g., different loaders based on env flags)
-* Inject test values safely with `.overrideForTest()`
-* Generate `.env.template` and validation reports with `npx envarna`
-
-See `Testing Best Practices` and `Advanced Loading` guides for more.
+- Rich validators and shapes: [Validation with v](/how-to/validation)
+- Aliases and naming: [Naming rules](/how-to/naming-aliases)
+- Secrets and redaction: [Protect secrets](/how-to/security-redaction)
+- Settings proxy and async sources: [Settings object](/how-to/settings-object), [Async loading](/how-to/async-loading)
+- Test overrides: [Testing](/how-to/testing)
