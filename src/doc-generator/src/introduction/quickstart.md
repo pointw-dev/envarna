@@ -109,7 +109,7 @@ Most of the time you will decorate your setting field with one of:
 * `@setting.boolean()`
 * `@setting.date()`
 * `@setting.array()`
-* `@setting.object()  // in progress`
+* `@setting.object()`
 
 If you want more control over the validation, use `v`:
 
@@ -125,7 +125,7 @@ If you want more control over the validation, use `v`:
   @setting(v.email())
   @setting(v.string().startsWith('aaa').includes('mmm').length(15).toUpperCase())
   ```
-* handling for arrays (and soon objects)
+* handling for arrays and objects
 
 You can still use raw Zod if needed, just remember to be aware of coercion:
 

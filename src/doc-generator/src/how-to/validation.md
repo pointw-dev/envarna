@@ -45,9 +45,16 @@ thresholds!: number[]
 
 @setting.array() // defaults to array of strings
 hosts!: string[]
+
+// Objects
+@setting(v.object({ name: v.string(), age: v.number() }))
+user!: { name: string; age: number }
+// or generic JSON object
+@setting.object()
+meta!: Record<string, unknown>
 ```
 
-For objects, you can use `@setting.object(...)` or define nested `BaseSettings` classes depending on your needs.
+Objects are JSON‑parsed from env strings (e.g., `APP_META={"a":1}`). Use a shape for strict typing when available.
 
 ## Defaults
 
@@ -62,4 +69,3 @@ name!: string                     // validator default
 ```
 
 Assignment defaults are typically clearer for simple cases; validator defaults shine when combined with other constraints.
-

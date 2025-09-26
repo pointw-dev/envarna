@@ -48,7 +48,7 @@ export class SmtpSettings extends BaseSettings {
   * `@setting.boolean()`
   * `@setting.date()`
   * `@setting.array()`
-  * `@setting.object()  // in progress`
+  * `@setting.object()`
 * for more advanced validation, use `v` to build a validation chain
   * e.g. `@setting(v.string().length(10))`
 * See [Decorators](decorators) for more

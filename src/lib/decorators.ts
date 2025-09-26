@@ -21,8 +21,18 @@ setting.boolean = () => setting(z.preprocess(parseIfString, z.boolean()));
 setting.date = () => setting(z.coerce.date());
 setting.array = <T extends ZodTypeAny = z.ZodString>(itemSchema?: T) =>
     setting(z.array(itemSchema ?? z.string()));
-setting.object = <T extends Record<string, ZodTypeAny>>(shape: T) =>
-    setting(z.object(shape));
+// Accepts optional shape or full schema; JSON-parses env string values first
+setting.object = (
+    schemaOrShape?: ZodTypeAny | Record<string, ZodTypeAny>
+) => {
+  const schema =
+      !schemaOrShape
+          ? z.record(z.any())
+          : (isZodType(schemaOrShape)
+              ? schemaOrShape
+              : z.object(schemaOrShape as Record<string, ZodTypeAny>));
+  return setting(z.preprocess(parseIfString, schema));
+}
 
 // Injects setting into process.env as ENVVAR
 export function pushToEnv(): PropertyDecorator {
@@ -57,7 +67,16 @@ export const v = {
   number: z.coerce.number,
   boolean: () => z.preprocess(parseIfString, z.boolean()),
   date: z.coerce.date,
-  object: z.object,
+  // JSON-parses env string values before validating
+  object: (schemaOrShape?: ZodTypeAny | Record<string, ZodTypeAny>) => {
+    const schema =
+        !schemaOrShape
+            ? z.record(z.any())
+            : (isZodType(schemaOrShape)
+                ? schemaOrShape
+                : z.object(schemaOrShape as Record<string, ZodTypeAny>));
+    return z.preprocess(parseIfString, schema);
+  },
   enum: <T extends string>(values: [T, ...T[]]) => z.enum(values),
   array: <T extends ZodTypeAny = z.ZodString>(itemSchema?: T) =>
       z.preprocess(parseIfString, z.array(itemSchema ?? z.string())),
@@ -114,6 +133,10 @@ function parseIfString(val: unknown): unknown {
     }
   }
   return val;
+}
+
+function isZodType(x: unknown): x is ZodTypeAny {
+  return !!x && typeof x === 'object' && (x as any)._def !== undefined;
 }
 
 

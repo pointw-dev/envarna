@@ -41,5 +41,3 @@ features:
     linkText: Learn more
     link: /introduction/quickstart
 ---
-
-This site and the library are under development.

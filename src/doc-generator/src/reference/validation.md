@@ -45,9 +45,16 @@ thresholds!: number[]
 
 @setting.array() // defaults to array of strings
 hosts!: string[]
+
+// Objects
+@setting(v.object({ name: v.string(), age: v.number() }))
+user!: { name: string; age: number }
+// or, simple JSON object without a shape
+@setting.object()
+meta!: Record<string, unknown>
 ```
 
-For objects, use `@setting.object(...)` or define nested `BaseSettings` classes.
+Objects are JSON‑parsed from env strings (e.g., `APP_USER={"name":"Ada","age":42}`).
 
 ## Defaults
 
