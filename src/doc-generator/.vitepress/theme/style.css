@@ -196,3 +196,16 @@
 .code {
     font-family: monospace;
 }
+
+/* Align home feature card links at the bottom for consistent rows */
+.VPHome .VPFeatures .item .box {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+.VPHome .VPFeatures .item .box .details {
+  flex: 1 1 auto;
+}
+.VPHome .VPFeatures .item .box .link {
+  margin-top: auto;
+}

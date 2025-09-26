@@ -20,24 +20,44 @@ hero:
       link: /introduction/quickstart
 
 features:
-  - title: Type Safety
-    icon: 🧷
-    details: With envarna, every setting value is strongly typed.  No more <span class="code">parseInt(process.env.FOO)</span> Instead, you define settings with decorators and envarna handles parsing and coercion automatically.<br/><br/><br/><br/><br/>
-    linkText: Learn more
-    link: /introduction/quickstart
-  - title: Validation and Defaults
+  - title: Strongly Typed Inputs
+    icon: 🧬
+    details: Define settings with decorators and get real types, not ad‑hoc parsing. Strings, numbers, booleans, dates, arrays, and objects are coerced from env safely.
+    linkText: Define decorators
+    link: /how-to/decorators
+  - title: Validation & Defaults
     icon: 🛡️
-    details: Envarna enforces validation rules at startup so you know immediately whether your app has all the settings it needs in the right format. You can also declare sensible defaults inline, making it easy to boot a service in development without requiring <span class="code">.env</span>.<br/><br/><br/><br/>
-    linkText: Learn more
-    link: /introduction/quickstart
-  - title: Centralized, Modular Settings
-    icon: 🗂️
-    details: In most dotenv-based apps, your config is fragmented across files and buried in conditional logic. Envarna changes that. All environment variables live in clearly defined settings classes, grouped by concern.  For example, <span class="code">DatabaseSettings</span> or <span class="code">EmailSettings</span>. This makes configuration discoverable.<br/><br/>
-    linkText: Learn more
-    link: /introduction/quickstart
-  - title: Injectable and Testable
+    details: Fail fast when inputs are missing or malformed, and express defaults inline or via validators so development is smooth without a huge .env.
+    linkText: Validate inputs
+    link: /how-to/validation
+  - title: Single Source of Truth
+    icon: 🗃️
+    details: Group env vars into settings classes (e.g., DatabaseSettings, EmailSettings) so configuration is discoverable, consistent, and reviewable.
+    linkText: Organize classes
+    link: /how-to/settings-classes
+  - title: Testable & Overridable
     icon: 🧪
-    details: Envarna settings are injectable. This makes testing a breeze.  You can instantiate a settings object with test values or mock data. No need to mutate <span class="code">process.env</span>. You can even load settings from alternate sources (e.g., secrets managers or scenario-driven test configs) without changing the rest of your application code.
-    linkText: Learn more
-    link: /introduction/quickstart
+    details: Override fields per test with `overrideForTest()` — no process.env mutation, no module reloads. Keep tests isolated and code deterministic.
+    linkText: Test settings
+    link: /how-to/testing
+  - title: CLI & Docs Generation
+    icon: 💻
+    details: List settings, generate .env templates, JSON/YAML, values.yaml, and Compose/K8s env blocks — all derived from your classes.
+    linkText: Run CLI tools
+    link: /reference/command-line
+  - title: Secrets & Redaction
+    icon: 🔒
+    details: Mark fields @secret to avoid accidental leaks. JSON dumps redact values while keeping structures intact for safe logging.
+    linkText: Protect secrets
+    link: /how-to/security-redaction
+  - title: Aliases & Naming
+    icon: 🏷️
+    details: Use clear naming by default, with alias overrides when you need to match external env conventions.
+    linkText: Control naming
+    link: /how-to/naming-aliases
+  - title: Advanced Coercion
+    icon: 🔄
+    details: JSON‑parse arrays and objects from env, validate shapes with Zod via the v builder, and compose rich constraints in one place.
+    linkText: Compose validators
+    link: /reference/validation
 ---
