@@ -38,3 +38,11 @@ If you have async overrides, ensure they run before you access the values. Typic
 
 You can also use `await settings.$ready()` if initialization happens elsewhere.
 
+## JSON dumps with async loaders
+
+If any groups are initialized asynchronously and `$override()` has not run yet, calling `JSON.stringify(settings)` will throw. Ensure initialization has completed first:
+
+```ts
+await settings.$ready();
+console.log(JSON.stringify(settings, null, 2));
+```

@@ -1,12 +1,12 @@
 # Settings classes
 
-> The following assumes that you create all settings classes in `src/settings`. Adjust as required if you put yours somewhere else.
+Envarna discovers settings classes by scanning your project for classes that extend `BaseSettings`. You can place them anywhere (e.g., `src/settings` is a common convention).
 
 The settings class is where it all begins.  Extend envarna's `BaseSettings` and define each setting your application needs as a field of that class.  When loaded
 
 Here is a quick example:
 
-```typescript:line-numbers
+```ts
 import { BaseSettings, setting } from "envarna";
 
 export class SmtpSettings extends BaseSettings {
@@ -33,7 +33,7 @@ export class SmtpSettings extends BaseSettings {
 
 ### Fields
 > lines 5, 8, 11
-* it is the class fields you use when you need the settings value (see )
+* it is the class fields you use when you need the settings value (e.g. `settings.smtp.host`)
 * the field is typed for TypeScript purposes (the decorator is for environment variable validation)
 * assigning a default value is optional, and the value is used if no matching environment variable is provided
  
@@ -101,7 +101,7 @@ camel-to-snake(s) = replace each uppercase letter in s with "_" + lowercase(lett
 ## Advanced validation
 In addition to field by field validations with decorators, you can also override `validate()` to perform validations across all fields.  For example, in the following class `username` and `password` are each optional.  To enforce the rule that if one is set both must be set:
 
-```typescript{23-32}
+```ts
 import { BaseSettings, setting, secret, v, alias } from "envarna";
 
 export class SmtpSettings extends BaseSettings {
@@ -112,7 +112,7 @@ export class SmtpSettings extends BaseSettings {
   port: number = 25
 
   @setting.string()
-  from: string = 'noreply@example.org'
+  fromEmail: string = 'noreply@example.org'
 
   @setting.boolean()
   useTls: boolean = false

@@ -56,6 +56,15 @@ meta!: Record<string, unknown>
 
 Objects are JSON‑parsed from env strings (e.g., `APP_USER={"name":"Ada","age":42}`).
 
+Env examples
+```bash
+# arrays
+export APP_HOSTS='["a.example.org","b.example.org"]'
+
+# objects
+export APP_USER='{"name":"Ada","age":42}'
+```
+
 ## Defaults
 
 Two default styles:

@@ -97,4 +97,4 @@ You don’t need to reach for envarna—but if you do, it’ll meet you where yo
 
 ---
 
-Still unsure? Try envarna in a single feature module. It may feel like a small shift now, but it prevents the kind of configuration debt that tends to surface later—often when it's least convenient.
+Still unsure? Try envarna in a single feature module. It may feel like a small shift now, but it prevents the kind of configuration debt that tends to surface later—often when it's least convenient. For a practical overview and examples, see [What is envarna?](/introduction/what-is).

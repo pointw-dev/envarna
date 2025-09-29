@@ -16,6 +16,10 @@
 - `json --root <name> --flat --code`: choose root, flatten, and use field names instead of ENVARs
 - `yaml --root <name> --flat --code`: same for YAML
 
+Defaults
+- `json`: `root` defaults to none (top-level object of groups/fields)
+- `yaml`: `root` defaults to `settings`
+
 ## Help
 ```bash
 npx envarna --help

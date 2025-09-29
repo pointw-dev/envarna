@@ -1,6 +1,6 @@
 # Settings object
 
-> The following assumes that you create all settings classes in `src/settings`. Adjust as required if you put yours somewhere else.
+Envarna discovers settings classes by scanning your project for classes that extend `BaseSettings`. You can place them anywhere (e.g., `src/settings` is a common convention).
 
 ## Basic
 This is optional but highly recommended.
@@ -52,7 +52,7 @@ For any async source (secrets/DB), include that key in `$override` before first 
 The `.load()` function takes an optional object.  When passed to `.load()` that object's values supersede any default value and any environment variable.  The object can add only the values you want - all others will behave as normal.
 
 Let's take this settings class as an example:
-```typescript
+```ts
 export class SmtpSettings extends BaseSettings {
   @setting.string()
   host: string = 'localhost';
@@ -66,11 +66,11 @@ export class SmtpSettings extends BaseSettings {
 ```
 and this `.env` file:
 ```plaintext
-SMPT_PORT=1025
-SMPT_FROM_MAIL=billing-system@example.org
+SMTP_PORT=1025
+SMTP_FROM_EMAIL=billing-system@example.org
 ```
 When we build the settings object, we can force `port` to be 666:
-```typescript
+```ts
 export const settings = createSettingsProxy({
   smtp: SmtpSettings,
 })
@@ -89,7 +89,7 @@ This technique can be used to bring values in from sources other than the enviro
 
 ## Conditional loading
 
-```typescript
+```ts
 // settings/index.ts
 import { createSettingsProxy } from "envarna";
 import { SecretManagerServiceClient } from '@google-cloud/secret-manager';
@@ -159,7 +159,7 @@ import { settings } from './settings';
 
 console.log(JSON.stringify(settings, null, 2))
 ```
-Any values marked `@secret()` will show a value of `'***'` instead of its actual value.
+Any values marked `@secret()` will show a value of `'****'` instead of its actual value. If any groups are initialized asynchronously and `$override()` has not run yet, call `await settings.$ready()` before dumping to JSON.
 
 ::: warning
 There is nothing stopping a developer from logging a secret value:

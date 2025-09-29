@@ -28,7 +28,7 @@ export class PubsubSettings extends BaseSettings {
 
 ## push-to-env
 
-Use `@pushToEnv()` to write a field’s value into `process.env` during load when the env var is missing. This helps integrate with tools that expect those variables.
+Use `@pushToEnv()` to always write a field’s value into `process.env` during load (overwriting if present). This helps integrate with tools that expect those variables.
 
 ```ts
 export class SmtpSettings extends BaseSettings {
@@ -41,4 +41,4 @@ export class SmtpSettings extends BaseSettings {
 Notes
 - Use sparingly; it’s a convenience to help local tooling.
 - If combined with `@alias`, the alias name is used for the env var.
-
+- Values are overwritten if the variable already exists in `process.env`.

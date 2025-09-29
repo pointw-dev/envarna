@@ -88,7 +88,7 @@ class SomeSettings extends BaseSettings {
 ```
 
 ## @pushToEnv (use sparingly)
-Writes the field's value back into `process.env` (using the alias if present) when missing. This can be handy for local tooling that expects env vars, but it carries risks:
+Always writes the field's value back into `process.env` during load (using the alias if present). This can be handy for local tooling that expects env vars, but it carries risks:
 
 ```ts
 @setting.string()

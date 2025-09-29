@@ -6,7 +6,7 @@ const hostname = 'https://pointw-dev.github.io'
 const basePath = 'envarna'
 const seoLogo = 'https://pointw-dev.github.io/envarna/img/envarna-card.png'
 const title = 'envarna'
-const tagline = 'Settings managed'
+const tagline = 'Settings managed.'
 
 const calculatedBasePath = (basePath? `/${basePath}/` : '/')
 const siteUrl = hostname + calculatedBasePath
@@ -40,7 +40,7 @@ export default defineConfig({
         }
     },
     footer:{
-      message: 'Released under the <a target="_blank" class="link" href="https://raw.githubusercontent.com/pointw-dev/hypermea/refs/heads/main/LICENSE">MIT License</a>.',
+      message: 'Released under the <a target="_blank" class="link" href="https://raw.githubusercontent.com/pointw-dev/envarna/refs/heads/main/LICENSE">MIT License</a>.',
       copyright: 'Copyright © 2025 Michael Ottoson (pointw.com)'
     }
   },
@@ -98,8 +98,7 @@ function getSidebar() {
         text: 'Introduction',
         items: [
           { text: 'What is envarna?', link: '/introduction/what-is' },
-          { text: 'Getting started', link: '/introduction/quickstart' },
-          { text: 'Motivations', link: '/introduction/motivations' }
+          { text: 'Getting started', link: '/introduction/quickstart' }
         ]
       },
       {

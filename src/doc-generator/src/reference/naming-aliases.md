@@ -9,4 +9,4 @@
 - `@alias('ENV_VAR_NAME')` maps a field to a specific env var and takes precedence.
 
 ## push-to-env
-- `@pushToEnv()` writes the field’s value into `process.env` when missing (use sparingly).
+- `@pushToEnv()` always writes the field’s value into `process.env` during load (overwriting if present). Use sparingly, and avoid using it for secrets.

@@ -3,7 +3,7 @@
 layout: home
 
 hero:
-  name: <img src="/envarna/img/banner.svg">
+  name: <img src="/envarna/img/banner.svg" alt="envarna banner">
   text: Settings managed.
   tagline: Make settings first-class citizens in your application.
 

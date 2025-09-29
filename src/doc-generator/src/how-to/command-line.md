@@ -19,8 +19,7 @@ Commands:
   envarna k8s          Display kubernetes style env var structure
   envarna json [root]  Display JSON settings structure
   envarna yaml [root]  Display YAML settings structure
-  envarna raw          Display the raw structure extracted from the settings cla
-                       sses used to power the other formats
+  envarna raw          Display the raw structure extracted from the settings classes used to power the other formats
 
 Options:
   --version   Show version number                                       [boolean]
@@ -35,6 +34,10 @@ Options:
 - `json --flat`: flatten output (no group nesting under root).
 - `json --code`: use field names as keys instead of ENVAR names.
 - `yaml --root/--flat/--code`: same as JSON for YAML output.
+
+Defaults
+- `json`: `root` defaults to none (top-level object of groups/fields)
+- `yaml`: `root` defaults to `settings`
 
 ## list
 Display settings details
@@ -52,7 +55,7 @@ Write `values.yaml`
 Display docker-compose style environment yaml
 
 ## k8s
-Display kubernetes style env var structure
+Display Kubernetes-style env var structure
 
 ## json
 Display JSON settings structure
@@ -68,3 +71,27 @@ Display YAML settings structure
 
 ## raw
 Raw output of the structure used to create the above
+
+### Example: `list`
+
+```text
+app (contains secrets)
+===
+Env Var            Alias                 Usual Path                 Type             Default
+-------            -----                 ----------                 ----             -------
+APP_NAME                                 settings.app.name          string           my-app
+APP_DEBUG                               settings.app.debug         boolean          
+APP_API_KEY (secret)  GOOGLE_API_KEY     settings.app.apiKey        string           
+
+smtp
+====
+Env Var                 Usual Path                 Type     Default
+-------                 ----------                 ----     -------
+SMTP_HOST               settings.smtp.host         string   localhost
+SMTP_PORT               settings.smtp.port         number   25
+SMTP_FROM_EMAIL         settings.smtp.fromEmail    string   noreply@example.org
+```
+
+Discovery
+- Scans the project for classes extending `BaseSettings` (excluding `node_modules`, `dist`, and `coverage`).
+- `--skip-dev` omits fields decorated with `@devOnly()`.

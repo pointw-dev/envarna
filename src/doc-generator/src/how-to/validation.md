@@ -56,6 +56,15 @@ meta!: Record<string, unknown>
 
 Objects are JSON‑parsed from env strings (e.g., `APP_META={"a":1}`). Use a shape for strict typing when available.
 
+Env examples
+```bash
+# arrays
+export APP_HOSTS='["a.example.org","b.example.org"]'
+
+# objects
+export APP_META='{"version":"1.2.3","flags":["x","y"]}'
+```
+
 ## Defaults
 
 Two default styles:

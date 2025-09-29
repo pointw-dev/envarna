@@ -98,7 +98,7 @@ user!: { name: string; age: number }
 ```
 
 ## @pushToEnv (use sparingly)
-Writes the field’s value back into `process.env` when missing.
+Always writes the field’s value back into `process.env` during load (overwriting if present).
 
 ```ts
 @setting.string()

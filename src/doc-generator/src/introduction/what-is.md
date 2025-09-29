@@ -2,6 +2,8 @@
 
 Envarna is a TypeScript library that helps you manage your application's settings. These are the settings that control how an application behaves and how it connects to other services.  Envarna is a lightweight wrapper over the [Zod validation library](https://zod.dev/api?id=strings), the [dotenv environment variable loader](https://www.npmjs.com/package/dotenv), with some syntactic sugar to make it all easy to use.
 
+Looking for a deeper rationale and comparisons? See [Why envarna?](/introduction/why-envarna).
+
 Many applications use environment variables to configure things like database connection strings, feature flags, rate limits, API keys,  ports, etc. Most of the time, that means reaching for `process.env` and `dotenv`.
 
 That works well until it doesn't.
@@ -22,7 +24,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 export function getPage(size: number): string[] {
-  const maxSize = parseInt(process.env.MAX_PAGE_SIZE || '100', 10);
+  const maxPageSize = parseInt(process.env.MAX_PAGE_SIZE || '100', 10);
   if (size > maxPageSize) {
     throw new Error(`Page size ${size} exceeds max of ${maxPageSize}`);
   }
@@ -38,7 +40,7 @@ export function getPage(size: number): string[] {
 * There’s no visibility into what settings exist
 * Tests must mutate `process.env` and reset it after
 
-All of these problems can be address with more sophisticated use of `process.env`.  That's what envarna does.
+All of these problems can be addressed with more sophisticated use of `process.env`. That's what envarna does.
 
 ### With envarna:
 
