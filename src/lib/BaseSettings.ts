@@ -92,13 +92,11 @@ export class BaseSettings {
     const parsed = schema.safeParse(merged);
     if (!parsed.success) {
       const className = this.name;
-      const issues = parsed.error.errors.map((issue) => ({
-        path: issue.path,
-        message: `[${className}.${issue.path.join('.')}] ${issue.message}`,
-        code: (issue as any).code,
-      }));
-      const message = issues.map((i) => i.message).join('\n') || 'Validation failed';
-      throw new EnvarnaValidationError(message, issues, { cause: parsed.error });
+      // Use centralized mapping; keep per-issue message raw, but format the summary message with class+field
+      const err = EnvarnaValidationError.fromZod(parsed.error, {
+        messageFormatter: (issues) => issues.map((i) => `[${className}.${i.path.join('.')}] ${i.message}`).join('\n') || 'Validation failed',
+      })
+      throw err
     }
 
     Object.assign(instance, parsed.data);
