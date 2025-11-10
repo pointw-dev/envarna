@@ -1,6 +1,6 @@
 {
   "name": "envarna",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Settings managed. A powerful library for managing configuration details.",
   "repository": {
     "type": "git",

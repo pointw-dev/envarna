@@ -58,7 +58,7 @@ export class EnvarnaValidationError extends EnvarnaError {
         const patch = opts.formatIssue(issue)
         if (patch.message !== undefined) base.message = patch.message
         if (patch.code !== undefined) base.code = patch.code
-        if (patch.meta !== undefined) base.meta = patch.meta
+        if (patch.meta !== undefined) base.meta = base.meta ? { ...base.meta, ...patch.meta } : patch.meta
       }
       return base
     })

@@ -93,8 +93,21 @@ export class BaseSettings {
     if (!parsed.success) {
       const className = this.name;
       // Use centralized mapping; keep per-issue message raw, but format the summary message with class+field
+      const aliases = getAliases(this)
       const err = EnvarnaValidationError.fromZod(parsed.error, {
         messageFormatter: (issues) => issues.map((i) => `[${className}.${i.path.join('.')}] ${i.message}`).join('\n') || 'Validation failed',
+        formatIssue: (issue) => {
+          const top = issue.path?.[0]
+          const field = typeof top === 'string' ? top : undefined
+          let envVar: string | undefined
+          let alias: string | undefined
+          if (field) {
+            const prefix = className.replace(/Settings$/, '').toUpperCase()
+            envVar = `${prefix}_${field.replace(/([a-z])([A-Z])/g, '$1_$2').toUpperCase()}`
+            alias = aliases[field]
+          }
+          return { meta: { envVar, alias } }
+        }
       })
       throw err
     }
