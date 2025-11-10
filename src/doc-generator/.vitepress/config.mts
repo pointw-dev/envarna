@@ -121,6 +121,7 @@ function getSidebar() {
           { text: 'Naming & aliases', link: '/reference/naming-aliases' },
           { text: 'Security & redaction', link: '/reference/security-redaction' },
           { text: 'Command line', link: '/reference/command-line' },
+          { text: 'Error handling', link: '/reference/error-handling' },
         ]
       }
     ]

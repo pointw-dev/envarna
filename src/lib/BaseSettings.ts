@@ -1,9 +1,10 @@
-import { z, ZodObject, ZodRawShape, ZodTypeAny, ZodError } from "zod";
+import { z, ZodObject, ZodRawShape, ZodTypeAny } from "zod";
 import 'reflect-metadata';
 import dotenv from "dotenv";
 import { extractPrefixedEnv } from "./utils";
 import { getAliases, getFieldSchemas, isSecret } from "./decorators";
 import { DOTENV_PATH } from "./paths";
+import { EnvarnaValidationError } from "./errors";
 
 export class BaseSettings {
   /** Holds test override values, if any. */
@@ -91,11 +92,13 @@ export class BaseSettings {
     const parsed = schema.safeParse(merged);
     if (!parsed.success) {
       const className = this.name;
-      const adjustedErrors = parsed.error.errors.map((issue) => ({
-        ...issue,
-        message: `[${className}.${issue.path}] ${issue.message}`,
+      const issues = parsed.error.errors.map((issue) => ({
+        path: issue.path,
+        message: `[${className}.${issue.path.join('.')}] ${issue.message}`,
+        code: (issue as any).code,
       }));
-      throw new ZodError(adjustedErrors);
+      const message = issues.map((i) => i.message).join('\n') || 'Validation failed';
+      throw new EnvarnaValidationError(message, issues, { cause: parsed.error });
     }
 
     Object.assign(instance, parsed.data);

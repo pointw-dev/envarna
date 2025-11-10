@@ -1,4 +1,4 @@
-# Security & redaction (Reference)
+# Security & redaction
 
 ## @secret
 Mark sensitive fields to avoid accidental leaks in JSON dumps and highlight in CLI.

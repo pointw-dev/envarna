@@ -138,6 +138,28 @@ npx envarna json --root cfg --flat --code --skip-dev
 ```
 
 
+## Error handling
+
+When validation fails, envarna throws an `EnvarnaValidationError`. Use the provided type guard to branch without importing Zod.
+
+```ts
+import { isValidationError } from 'envarna'
+
+try {
+  const s = SmtpSettings.load()
+} catch (err) {
+  if (isValidationError(err)) {
+    console.error('Invalid configuration:')
+    err.issues.forEach(i => console.error(`${i.path.join('.')} → ${i.message}`))
+  } else {
+    throw err
+  }
+}
+```
+
+See the docs for details: https://pointw-dev.github.io/envarna/reference/error-handling
+
+
 ## Testing
 
 Envarna keeps testing simple without DI or heavy mocks. Two common patterns are supported:

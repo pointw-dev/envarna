@@ -1,4 +1,4 @@
-# Naming & aliases (Reference)
+# Naming & aliases
 
 ## Naming convention
 - Class prefix: before `Settings`, uppercased (e.g., `MongoSettings` → `MONGO`).
