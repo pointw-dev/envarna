@@ -1,6 +1,6 @@
 # envarna
 
-![](https://www.pointw.com/img/envarna-logo.svg)
+![](https://pointw-dev.github.io/envarna/img/envarna-logo.svg)
 
 > **Settings managed.**  
 
